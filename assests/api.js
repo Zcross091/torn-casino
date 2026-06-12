@@ -2,6 +2,7 @@
 class TornAPI {
     constructor() {
         this.apiKey = localStorage.getItem(CONFIG.STORAGE_KEY_API_KEY);
+        this.sessionToken = localStorage.getItem('casino_session_token');
     }
 
     setApiKey(key) {
@@ -11,65 +12,33 @@ class TornAPI {
 
     clearApiKey() {
         this.apiKey = null;
+        this.sessionToken = null;
         localStorage.removeItem(CONFIG.STORAGE_KEY_API_KEY);
+        localStorage.removeItem('casino_session_token');
     }
 
-    /**
-     * Verify API key and get user info
-     */
     async getUserInfo() {
         if (!this.apiKey) {
             throw new Error('No API key set');
         }
-
         try {
-            // If a backend proxy is configured, use it to verify the API key
-            if (CONFIG.BACKEND_URL) {
-                const res = await fetch(`${CONFIG.BACKEND_URL.replace(/\/$/, '')}/api/auth/login`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ apiKey: this.apiKey })
-                });
-
-                if (!res.ok) {
-                    const txt = await res.text().catch(() => '');
-                    throw new Error(`Backend auth failed (status ${res.status}) ${txt}`);
-                }
-
-                const json = await res.json();
-                // Backend returns { userId, username, balance }
-                return {
-                    id: json.userId || json.id,
-                    name: json.username || json.name,
-                    level: json.level || 0,
-                    money: json.balance != null ? json.balance : (json.money || 0),
-                    lastAction: json.lastAction || null
-                };
-            }
-
-            // Use the Torn API /user endpoint and request JSON explicitly.
-            const url = `${CONFIG.API_BASE}/user/?selections=profile&key=${this.apiKey}&format=json`;
-            const response = await fetch(url);
-
-            if (!response.ok) {
-                const txt = await response.text().catch(() => '');
-                throw new Error(`Failed to fetch user info (status ${response.status}) ${txt}`);
-            }
-
-            const data = await response.json().catch(err => {
-                throw new Error('Invalid JSON response from API: ' + err.message);
+            const res = await fetch(`${CONFIG.BACKEND_URL}/api/auth/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ apiKey: this.apiKey })
             });
-
-            if (data && data.error) {
-                throw new Error(data.error.error || JSON.stringify(data.error));
-            }
+            if (!res.ok) throw new Error('Backend auth failed');
+            const json = await res.json();
+            
+            this.sessionToken = json.sessionToken;
+            localStorage.setItem('casino_session_token', this.sessionToken);
+            this.setLocalBalance(json.balance);
 
             return {
-                id: data.player_id,
-                name: data.name,
-                level: data.level,
-                money: data.money,
-                lastAction: data.last_action
+                id: json.userId,
+                name: json.username,
+                money: json.balance,
+                vip_tier: json.vip_tier
             };
         } catch (error) {
             console.error('API Error:', error);
@@ -77,43 +46,16 @@ class TornAPI {
         }
     }
 
-    /**
-     * Get user's money (for balance checking)
-     */
     async getMoney() {
-        const info = await this.getUserInfo();
-        return info.money;
+        const res = await fetch(`${CONFIG.BACKEND_URL}/api/user/balance`, {
+            headers: { 'Authorization': `Bearer ${this.sessionToken}` }
+        });
+        if (!res.ok) throw new Error('Failed to fetch balance');
+        const data = await res.json();
+        this.setLocalBalance(data.balance);
+        return data.balance;
     }
 
-    /**
-     * Simulate a money deduction (in real scenario, this would go to backend)
-     * For now, we use local storage to track casino tokens
-     */
-    async deductMoney(amount) {
-        // This should be handled by your backend
-        // For now, we'll use local balance
-        const currentBalance = this.getLocalBalance();
-        if (currentBalance < amount) {
-            throw new Error('Insufficient balance');
-        }
-        this.setLocalBalance(currentBalance - amount);
-        return true;
-    }
-
-    /**
-     * Add winnings (in real scenario, this would go to backend)
-     */
-    async addMoney(amount) {
-        // This should be handled by your backend
-        // For now, we'll use local balance
-        const currentBalance = this.getLocalBalance();
-        this.setLocalBalance(currentBalance + amount);
-        return true;
-    }
-
-    /**
-     * Local balance management (until backend is set up)
-     */
     getLocalBalance() {
         return parseInt(localStorage.getItem(CONFIG.STORAGE_KEY_BALANCE)) || 0;
     }
@@ -122,31 +64,65 @@ class TornAPI {
         localStorage.setItem(CONFIG.STORAGE_KEY_BALANCE, Math.max(0, amount).toString());
     }
 
-    /**
-     * Add bet to history
-     */
+    // UI instantly reflects bet deduction
+    deductMoney(amount) {
+        const currentBalance = this.getLocalBalance();
+        if (currentBalance < amount) {
+            throw new Error('Insufficient balance');
+        }
+        this.setLocalBalance(currentBalance - amount);
+        return true;
+    }
+
+    // UI instantly reflects win
+    addMoney(amount) {
+        const currentBalance = this.getLocalBalance();
+        this.setLocalBalance(currentBalance + amount);
+        return true;
+    }
+
+    // Sync with backend when bet finishes
     addBet(bet) {
         const bets = this.getBets();
         bets.unshift({
             ...bet,
             timestamp: new Date().toISOString()
         });
-        // Keep only last 100 bets
         bets.splice(100);
         localStorage.setItem(CONFIG.STORAGE_KEY_BETS, JSON.stringify(bets));
+
+        // Sync with backend
+        this.syncBetWithServer(bet);
     }
 
-    /**
-     * Get bet history
-     */
+    async syncBetWithServer(bet) {
+        try {
+            const res = await fetch(`${CONFIG.BACKEND_URL}/api/bets/place`, {
+                method: 'POST',
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${this.sessionToken}`
+                },
+                body: JSON.stringify({ game: bet.game, amount: bet.betAmount, multiplier: bet.multiplier })
+            });
+            const data = await res.json();
+            if (data.newBalance !== undefined) {
+                this.setLocalBalance(data.newBalance);
+                // Try to trigger a UI update safely if possible
+                if (typeof ui !== 'undefined' && ui.updateBalance) {
+                    ui.updateBalance();
+                }
+            }
+        } catch (e) {
+            console.error("Failed to sync bet with backend:", e);
+        }
+    }
+
     getBets() {
         const bets = localStorage.getItem(CONFIG.STORAGE_KEY_BETS);
         return bets ? JSON.parse(bets) : [];
     }
 
-    /**
-     * Clear all data
-     */
     clearAllData() {
         localStorage.removeItem(CONFIG.STORAGE_KEY_USER);
         localStorage.removeItem(CONFIG.STORAGE_KEY_BALANCE);
@@ -169,7 +145,6 @@ class TornAPI {
             await this.getUserInfo();
             return true;
         } catch (error) {
-            console.warn('Session validation failed:', error.message);
             return false;
         }
     }

@@ -1,4 +1,37 @@
-// Base Game Engine with animation and improved logic
+// Sound System (Web Audio API)
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playTone(freq, type, duration, vol=0.1) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+    
+    gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+    
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    
+    osc.start();
+    osc.stop(audioCtx.currentTime + duration);
+}
+
+const sounds = {
+    playSpin: () => playTone(300, 'sine', 0.1, 0.05),
+    playWin: () => {
+        playTone(400, 'sine', 0.1, 0.1);
+        setTimeout(() => playTone(600, 'sine', 0.2, 0.1), 100);
+        setTimeout(() => playTone(800, 'sine', 0.4, 0.1), 200);
+    },
+    playLose: () => {
+        playTone(300, 'sawtooth', 0.2, 0.1);
+        setTimeout(() => playTone(200, 'sawtooth', 0.4, 0.1), 200);
+    }
+};
+
+// Base Game Engine with animation, sounds, and improved logic
 class GameEngine {
     constructor(gameId, gameName, options = {}) {
         this.gameId = gameId;
@@ -34,6 +67,8 @@ class GameEngine {
         this.isPlaying = true;
         this.result = null;
 
+        sounds.playSpin();
+
         return true;
     }
 
@@ -59,6 +94,7 @@ class GameEngine {
 
         this.isPlaying = false;
         this.showRewardAnimation(this.currentBet + netWin, 'win');
+        sounds.playWin();
         return this.result;
     }
 
@@ -79,6 +115,7 @@ class GameEngine {
 
         this.isPlaying = false;
         this.showRewardAnimation(this.currentBet, 'loss');
+        sounds.playLose();
         return this.result;
     }
 

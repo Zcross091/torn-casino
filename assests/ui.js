@@ -31,6 +31,46 @@ class UIManager {
         document.getElementById('gameModal').addEventListener('click', (e) => {
             if (e.target.id === 'gameModal') this.closeGame();
         });
+
+        // Chat Widget
+        document.getElementById('toggleChatBtn')?.addEventListener('click', () => {
+            const widget = document.getElementById('chatWidget');
+            widget.style.display = widget.style.display === 'none' ? 'flex' : 'none';
+        });
+
+        document.getElementById('sendChatBtn')?.addEventListener('click', () => this.sendChatMessage());
+        document.getElementById('chatInput')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.sendChatMessage();
+        });
+
+        // Daily Bonus
+        document.getElementById('dailyBonusBtn')?.addEventListener('click', () => this.claimDailyBonus());
+    }
+
+    sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const text = input.value.trim();
+        if (text && window.pvpCoinflip?.socket) {
+            window.pvpCoinflip.socket.emit('send_chat', text);
+            input.value = '';
+        }
+    }
+
+    async claimDailyBonus() {
+        try {
+            const res = await fetch(`${CONFIG.BACKEND_URL}/api/user/daily-bonus`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${api.sessionToken}` }
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error);
+            
+            alert(data.message);
+            api.setLocalBalance(data.newBalance);
+            this.updateBalance();
+        } catch (error) {
+            alert(error.message);
+        }
     }
 
     async handleLogin() {
@@ -77,12 +117,22 @@ class UIManager {
             api.restoreSession();
         }
 
+        this.userInfo = userInfo;
+
         document.getElementById('auth-container').classList.add('hidden');
         document.getElementById('casino-container').classList.remove('hidden');
         
         document.getElementById('username').textContent = userInfo.name;
         this.updateBalance();
         
+        if (typeof PvPCoinflip !== 'undefined' && !window.pvpCoinflip) {
+            window.pvpCoinflip = new PvPCoinflip();
+        }
+        
+        // Show chat button
+        const chatBtn = document.getElementById('toggleChatBtn');
+        if (chatBtn) chatBtn.style.display = 'flex';
+
         const activeSideBtns = document.querySelectorAll('.side-btn.active');
         if (activeSideBtns.length === 0) {
             const sidebarLobbyBtn = document.querySelector('[data-tab="lobby"].side-btn');
@@ -117,13 +167,46 @@ class UIManager {
         const pane = document.getElementById(tabName);
         if (pane) pane.classList.add('active');
 
-        // Load bets if viewing bets tab
+        // Load specific tab data
         if (tabName === 'bets') {
             this.loadBets();
+        } else if (tabName === 'leaderboard') {
+            this.loadLeaderboard();
         }
 
         // Save current tab preference
         localStorage.setItem('lastViewedTab', tabName);
+    }
+
+    async loadLeaderboard() {
+        const list = document.getElementById('leaderboard-list');
+        list.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px;">Loading...</td></tr>';
+        
+        try {
+            const res = await fetch(`${CONFIG.BACKEND_URL}/api/leaderboard`);
+            const data = await res.json();
+            
+            if (data.length === 0) {
+                list.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--text-secondary);">No data yet</td></tr>';
+                return;
+            }
+
+            list.innerHTML = data.map((user, index) => `
+                <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                    <td style="padding: 12px 10px;">
+                        ${index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                    </td>
+                    <td style="padding: 12px 10px; font-weight: bold; color: ${index < 3 ? 'var(--primary)' : 'var(--text)'};">
+                        ${user.username}
+                    </td>
+                    <td style="padding: 12px 10px; text-align: right;">
+                        $${user.total_wagered.toLocaleString()}
+                    </td>
+                </tr>
+            `).join('');
+        } catch (e) {
+            list.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: var(--danger);">Failed to load leaderboard</td></tr>';
+        }
     }
 
     openGame(gameId) {
@@ -257,11 +340,6 @@ class UIManager {
 
                 playBtn.disabled = true;
                 setTimeout(() => { playBtn.disabled = false; }, 1500);
-                this.updateBalance();
-                `;
-                resultDiv.style.display = 'block';
-
-                playBtn.disabled = true;
                 this.updateBalance();
             } catch (error) {
                 alert(error.message);

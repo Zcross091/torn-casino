@@ -107,11 +107,13 @@ body {
 }
 
 .login-box .login-card {
-    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.05));
+    background: linear-gradient(180deg, rgba(30, 40, 60, 0.4), rgba(15, 20, 30, 0.6));
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-radius: 14px;
     padding: 36px 40px;
     box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 8px 30px rgba(0,255,0,0.03) inset;
-    border: 1px solid rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
 }
 
 /* Buttons */
@@ -172,7 +174,9 @@ body {
 /* Top Bar */
 .top-bar {
     background: linear-gradient(135deg, rgba(0, 255, 0, 0.05), rgba(0, 170, 0, 0.05));
-    border-bottom: 2px solid var(--border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.05);
     padding: 15px 20px;
     display: flex;
     justify-content: space-between;
@@ -314,8 +318,10 @@ body {
 }
 
 .game-card {
-    background: linear-gradient(135deg, rgba(0, 255, 0, 0.04), rgba(0, 0, 0, 0.06));
-    border: 1px solid rgba(255,255,255,0.03);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.2));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.08);
     border-radius: 12px;
     padding: 14px;
     text-align: center;
@@ -429,8 +435,11 @@ body {
 }
 
 .modal-content {
-    background: var(--card-bg);
-    border: 2px solid var(--border);
+    background: rgba(26, 31, 46, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
     border-radius: 12px;
     width: 90%;
     max-width: 700px;
