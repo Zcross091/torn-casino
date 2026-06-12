@@ -1,0 +1,855 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #00ff00;
+    --primary-dark: #00cc00;
+    --dark-bg: #0b0f18;
+    --card-bg: #1a1f2e;
+    --border: #2a3f5f;
+    --text: #e0e0e0;
+    --text-secondary: #8a92a2;
+    --danger: #ff4444;
+    --success: #00ff00;
+    --warning: #ffaa00;
+}
+
+body {
+    /* Dark overlay + background image for a cinematic casino feel.
+       Replace the URL with your own image or with `assests/background.jpg`. */
+    background:
+        linear-gradient(rgba(11,15,24,0.75), rgba(11,15,24,0.75)),
+        url('https://images.unsplash.com/photo-1520975910240-8e0e23c36f1d?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat fixed;
+    background-blend-mode: overlay;
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+}
+
+#app {
+    min-height: 100vh;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Login */
+.login-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+    text-align: center;
+    /* subtle backdrop for login area */
+    padding: 60px 20px;
+}
+
+.login-box h1 {
+    font-size: 42px;
+    margin-bottom: 6px;
+    color: var(--primary);
+    text-shadow: 0 6px 28px rgba(0,255,0,0.08), 0 2px 8px rgba(0,0,0,0.6);
+}
+
+.login-box p {
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    font-size: 16px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 400px;
+    margin-bottom: 20px;
+}
+
+.input {
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--text);
+    border-radius: 10px;
+    font-size: 16px;
+    transition: box-shadow 220ms ease, border-color 220ms ease, transform 180ms ease;
+}
+
+.input:focus {
+    outline: none;
+    border-color: rgba(0,255,0,0.6);
+    box-shadow: 0 8px 28px rgba(0,255,0,0.08);
+    transform: translateY(-1px);
+}
+
+.help-text {
+    color: var(--text-secondary);
+    font-size: 12px;
+    margin-top: 10px;
+}
+
+/* Login specific large primary button and card */
+.btn-primary {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 8px;
+    font-size: 18px;
+    background: linear-gradient(90deg,#00ff33,#00cc33);
+    box-shadow: 0 12px 36px rgba(0,255,0,0.12), 0 4px 12px rgba(0,0,0,0.6);
+    color: #051014;
+}
+
+.login-box .login-card {
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.05));
+    border-radius: 14px;
+    padding: 36px 40px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6), 0 8px 30px rgba(0,255,0,0.03) inset;
+    border: 1px solid rgba(255,255,255,0.03);
+}
+
+/* Buttons */
+.btn, .btn-primary, .btn-small, .btn-close {
+    padding: 12px 24px;
+    background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 180ms ease, box-shadow 220ms ease;
+    font-size: 16px;
+}
+
+.btn:hover, .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 18px 50px rgba(0, 255, 0, 0.12), 0 6px 18px rgba(0,0,0,0.6);
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 14px;
+    background: var(--card-bg);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.btn-small:hover {
+    background: var(--primary);
+    color: #000;
+}
+
+.btn-close {
+    padding: 8px 12px;
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-size: 24px;
+    line-height: 1;
+    width: 40px;
+    height: 40px;
+}
+
+.btn-close:hover {
+    background: var(--card-bg);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+/* Casino Container */
+#casino-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Top Bar */
+.top-bar {
+    background: linear-gradient(135deg, rgba(0, 255, 0, 0.05), rgba(0, 170, 0, 0.05));
+    border-bottom: 2px solid var(--border);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.casino-title h1 {
+    font-size: 28px;
+    background: linear-gradient(135deg, var(--primary), #00aa00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.balance-display {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.balance-display .label {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.balance-display .amount {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.user-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 8px;
+}
+
+.username {
+    font-size: 14px;
+    color: var(--text);
+}
+
+/* Tab Navigation */
+.tab-nav {
+    display: flex;
+    gap: 0;
+    background: var(--card-bg);
+    border-bottom: 2px solid var(--border);
+    overflow-x: auto;
+    padding: 0 20px;
+}
+
+.tab-btn {
+    padding: 15px 20px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+}
+
+.tab-btn:hover {
+    color: var(--text);
+}
+
+.tab-btn.active {
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+}
+
+/* Tab Content */
+.tab-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.tab-pane {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-pane.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Lobby */
+.lobby-container {
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.welcome-section {
+    margin-bottom: 40px;
+    text-align: center;
+}
+
+.welcome-section h2 {
+    font-size: 32px;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, var(--primary), #00aa00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.welcome-section p {
+    color: var(--text-secondary);
+    font-size: 16px;
+}
+
+.game-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 24px;
+    margin-bottom: 40px;
+    align-items: start;
+    padding: 10px 6px;
+}
+
+.game-card {
+    background: linear-gradient(135deg, rgba(0, 255, 0, 0.04), rgba(0, 0, 0, 0.06));
+    border: 1px solid rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 14px;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 260ms cubic-bezier(.2,.9,.2,1), box-shadow 260ms ease, border-color 260ms ease;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-height: 220px;
+    max-width: 260px;
+    margin: 0 auto;
+    overflow: hidden;
+}
+
+.game-card:hover {
+    border-color: rgba(0,255,0,0.25);
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6), 0 6px 18px rgba(0,255,0,0.06);
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,255,0,0.015));
+}
+
+.game-icon {
+    font-size: 48px;
+    width: 110px;
+    height: 110px;
+    border-radius: 12px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));
+    box-shadow: 0 6px 18px rgba(0,0,0,0.6) inset, 0 6px 18px rgba(0,0,0,0.25);
+    font-size: 36px;
+}
+
+.game-card h3 {
+    font-size: 18px;
+    margin: 6px 0 0 0;
+    line-height: 1.15;
+}
+
+.game-card p {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin: 6px 0 0 0;
+}
+
+/* Card action area (buttons, controls) sticks to bottom */
+.game-card .card-footer {
+    margin-top: auto;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Responsive tweaks */
+@media (max-width: 600px) {
+    .game-grid {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: 16px;
+    }
+    .game-card {
+        min-height: 200px;
+        padding: 12px;
+    }
+    .game-icon { width: 88px; height: 88px; }
+}
+
+/* Prefer local background image if present, otherwise fall back to remote */
+body {
+    background:
+        linear-gradient(rgba(11,15,24,0.75), rgba(11,15,24,0.75)),
+        url('assests/background.svg') center/cover no-repeat fixed,
+        url('https://images.unsplash.com/photo-1520975910240-8e0e23c36f1d?auto=format&fit=crop&w=1950&q=80') center/cover no-repeat fixed;
+    background-blend-mode: overlay;
+}
+
+.multiplier {
+    color: var(--primary);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+/* Games List */
+.games-list {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.games-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+/* Sidebar layout */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 220px;
+    padding: 22px 16px;
+    background: linear-gradient(180deg, rgba(3,6,10,0.65), rgba(3,6,10,0.45));
+    border-right: 1px solid rgba(255,255,255,0.03);
+    z-index: 1200;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sidebar .logo h2 {
+    color: var(--primary);
+    margin: 0;
+    font-size: 18px;
+}
+
+.side-nav { display:flex; flex-direction: column; gap:8px; }
+.side-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 8px 10px;
+    text-align: left;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+}
+.side-btn:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+.side-btn.active { color: var(--primary); background: rgba(0,255,0,0.04); }
+
+/* shift main content to the right so sidebar doesn't overlap */
+@media (min-width: 880px) {
+    #casino-container { padding-left: 240px; }
+}
+
+/* Thumbnail images inside cards */
+.game-thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+    display: block;
+}
+
+/* Make sure top bar stretches full width (after sidebar) */
+.top-bar { position: relative; z-index: 1100; }
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 2px solid var(--border);
+}
+
+.modal-header h2 {
+    margin: 0;
+}
+
+.game-container {
+    padding: 20px;
+}
+
+/* Game Specific Styles */
+.game-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.control-group label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.control-group input {
+    padding: 10px;
+    background: var(--dark-bg);
+    border: 2px solid var(--border);
+    color: var(--text);
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.game-result {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+}
+
+.game-result.win {
+    background: rgba(0, 255, 0, 0.1);
+    border: 2px solid var(--primary);
+    color: var(--primary);
+}
+
+.game-result.lose {
+    background: rgba(255, 68, 68, 0.1);
+    border: 2px solid var(--danger);
+    color: var(--danger);
+}
+
+/* Bets History */
+.bets-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bet-item {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 15px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.bet-info {
+    flex: 1;
+}
+
+.bet-game {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.bet-time {
+    color: var(--text-secondary);
+    font-size: 12px;
+}
+
+.bet-result {
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 4px;
+}
+
+.bet-result.win {
+    color: var(--primary);
+    background: rgba(0, 255, 0, 0.1);
+}
+
+.bet-result.lose {
+    color: var(--danger);
+    background: rgba(255, 68, 68, 0.1);
+}
+
+/* Shop */
+.shop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.shop-item {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+}
+
+.shop-item h3 {
+    margin-bottom: 10px;
+}
+
+.shop-item .price {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 5px;
+}
+
+.shop-item .bonus {
+    color: var(--warning);
+    font-size: 14px;
+    margin-bottom: 15px;
+}
+
+/* Utility */
+.loading {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-secondary);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .game-grid {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
+
+    .top-bar {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .user-info {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .tab-nav {
+        padding: 0 10px;
+    }
+
+    .tab-btn {
+        padding: 12px 15px;
+        font-size: 12px;
+    }
+
+    .modal-content {
+        width: 95%;
+        max-height: 95vh;
+    }
+}
+
+/* ========== GAME ANIMATIONS ========== */
+
+/* Dice roll animation */
+@keyframes diceBounce {
+    0% { transform: scale(1) rotateX(0) rotateY(0); }
+    50% { transform: scale(1.1) rotateX(180deg) rotateY(180deg); }
+    100% { transform: scale(1) rotateX(360deg) rotateY(360deg); }
+}
+
+#wheelVisual.spinning {
+    animation: wheelSpin 0.8s cubic-bezier(.17,.67,.83,.67) forwards;
+}
+
+@keyframes wheelSpin {
+    0% { transform: rotateZ(0deg) scale(1); }
+    50% { transform: rotateZ(1080deg) scale(1.05); }
+    100% { transform: rotateZ(1440deg) scale(1); }
+}
+
+/* Win animation */
+@keyframes winPulse {
+    0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(0,255,0,0.3); }
+    50% { transform: scale(1.08); box-shadow: 0 0 40px rgba(0,255,0,0.6); }
+}
+
+/* Loss shake */
+@keyframes loseShake {
+    0%, 100% { transform: translateX(0) rotateZ(0deg); }
+    25% { transform: translateX(-8px) rotateZ(-2deg); }
+    50% { transform: translateX(8px) rotateZ(2deg); }
+    75% { transform: translateX(-4px) rotateZ(-1deg); }
+}
+
+/* Reward counter animation */
+@keyframes countUp {
+    0% { opacity: 0; transform: translateY(20px); }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { opacity: 0; transform: translateY(-60px); }
+}
+
+.game-result {
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 20px;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 600;
+    border: 2px solid transparent;
+    animation: fadeIn 0.3s ease;
+}
+
+.game-result.win {
+    background: linear-gradient(135deg, rgba(0,255,0,0.15), rgba(0,170,0,0.08));
+    border-color: rgba(0,255,0,0.3);
+    color: var(--success);
+    animation: winPulse 0.6s ease-in-out;
+    box-shadow: 0 0 30px rgba(0,255,0,0.2);
+}
+
+.game-result.lose {
+    background: linear-gradient(135deg, rgba(255,68,68,0.15), rgba(200,50,50,0.08));
+    border-color: rgba(255,68,68,0.3);
+    color: var(--danger);
+    animation: loseShake 0.4s ease-in-out;
+}
+
+/* Animated counter */
+.reward-counter {
+    position: fixed;
+    pointer-events: none;
+    font-weight: 700;
+    font-size: 24px;
+    animation: countUp 2s ease-out forwards;
+}
+
+.reward-counter.win {
+    color: var(--success);
+    text-shadow: 0 0 10px rgba(0,255,0,0.4);
+}
+
+.reward-counter.loss {
+    color: var(--danger);
+    text-shadow: 0 0 10px rgba(255,68,68,0.4);
+}
+
+/* Game container animations */
+.game-controls {
+    animation: fadeIn 0.4s ease;
+}
+
+.control-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.control-group label {
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* Spinning wheel visual */
+.wheel-display {
+    perspective: 1000px;
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#wheelVisual {
+    display: inline-block;
+    transition: transform 0.1s ease;
+}
+
+/* Dice visual */
+.dice-display {
+    perspective: 1000px;
+    margin: 20px 0;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#diceVisual {
+    font-size: 72px;
+    display: inline-block;
+    transform-style: preserve-3d;
+}
+
+#diceVisual.rolling {
+    animation: diceBounce 0.8s cubic-bezier(.34,.1,.68,.55) forwards;
+}
+
+/* Better input styling */
+select.input, textarea.input {
+    padding: 10px 12px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.06);
+    color: var(--text);
+    border-radius: 10px;
+    font-size: 14px;
+    transition: border-color 220ms ease, box-shadow 220ms ease;
+}
+
+select.input:focus, textarea.input:focus {
+    outline: none;
+    border-color: rgba(0,255,0,0.6);
+    box-shadow: 0 8px 28px rgba(0,255,0,0.08);
+}
+
+/* Bet display enhancement */
+.current-bet {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 16px 0;
+    padding: 12px;
+    background: rgba(0,255,0,0.05);
+    border-radius: 8px;
+    border-left: 3px solid var(--primary);
+}

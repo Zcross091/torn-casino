@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#0b0f18">
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <title>Casino - Torn City Gaming</title>
+    <link rel="stylesheet" href="assests/styles.css">
+</head>
+<body>
+    <div id="app">
+        <div id="auth-container" class="hidden">
+            <div class="login-box">
+                <h1>🎰 Casino Login</h1>
+                <p>Enter your Torn City API key to get started</p>
+                <div class="form-group">
+                    <input type="password" id="apiKeyInput" placeholder="Your API Key" class="input">
+                    <button id="loginBtn" class="btn btn-primary">Login</button>
+                </div>
+                <p class="help-text">Your API key stays secure and never leaves your browser</p>
+            </div>
+        </div>
+
+        <div id="casino-container" class="hidden">
+            <!-- Top Bar -->
+            <header class="top-bar">
+                <div class="casino-title">
+                    <h1>🎰 CASINO</h1>
+                </div>
+                <div class="user-info">
+                    <div class="balance-display">
+                        <span class="label">Balance:</span>
+                        <span class="amount" id="balanceAmount">$0</span>
+                    </div>
+                    <div class="user-details">
+                        <span id="username" class="username">Loading...</span>
+                        <button id="logoutBtn" class="btn-small">Logout</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="logo">
+                    <h2>CASINO</h2>
+                </div>
+                <nav class="side-nav">
+                    <button class="side-btn active" data-tab="lobby">Lobby</button>
+                    <button class="side-btn" data-tab="solo">Solo Games</button>
+                    <button class="side-btn" data-tab="pvp">PvP Games</button>
+                    <button class="side-btn" data-tab="bets">Bets</button>
+                    <button class="side-btn" data-tab="shop">Shop</button>
+                </nav>
+                <div style="flex:1"></div>
+                <div class="theme-toggle">
+                    <button id="signInBtn" class="btn-small">Sign in</button>
+                </div>
+            </aside>
+
+            <!-- Tab Navigation (kept for compatibility) -->
+            <nav class="tab-nav">
+                <button class="tab-btn active" data-tab="lobby">🎯 Lobby</button>
+                <button class="tab-btn" data-tab="solo">🎮 Solo Games</button>
+                <button class="tab-btn" data-tab="pvp">⚔️ PvP Games</button>
+                <button class="tab-btn" data-tab="bets">📊 Bets</button>
+                <button class="tab-btn" data-tab="shop">🛍️ Shop</button>
+            </nav>
+
+            <!-- Tab Content -->
+            <main class="tab-content">
+                <!-- Lobby Tab -->
+                <div class="tab-pane active" id="lobby">
+                    <div class="lobby-container">
+                        <div class="welcome-section">
+                            <h2>Welcome to the Casino!</h2>
+                            <p>Choose a game from below to start playing. The house takes a small rake on each game.</p>
+                        </div>
+                        <div class="game-grid">
+                            <div class="game-card" data-game="solo-dice">
+                                <div class="game-icon"><img src="assests/thumbs/dice.svg" class="game-thumb" alt="Dice"></div>
+                                <h3>Dice</h3>
+                                <p>Roll the dice and predict higher or lower</p>
+                                <span class="multiplier">Up to 6x</span>
+                            </div>
+                            <div class="game-card" data-game="solo-wheel">
+                                <div class="game-icon"><img src="assests/thumbs/wheel.svg" class="game-thumb" alt="Wheel"></div>
+                                <h3>Wheel</h3>
+                                <p>Spin the wheel and win big</p>
+                                <span class="multiplier">Up to 10x</span>
+                            </div>
+                            <div class="game-card" data-game="solo-crash">
+                                <div class="game-icon"><img src="assests/thumbs/crash.svg" class="game-thumb" alt="Crash"></div>
+                                <h3>Crash</h3>
+                                <p>Cash out before the crash</p>
+                                <span class="multiplier">Variable</span>
+                            </div>
+                            <div class="game-card" data-game="solo-mines">
+                                <div class="game-icon"><img src="assests/thumbs/mines.svg" class="game-thumb" alt="Mines"></div>
+                                <h3>Mines</h3>
+                                <p>Find gems and avoid the mines</p>
+                                <span class="multiplier">Up to 10x</span>
+                            </div>
+                            <div class="game-card" data-game="solo-hilo">
+                                <div class="game-icon"><img src="assests/thumbs/hilo.svg" class="game-thumb" alt="Hi-Lo"></div>
+                                <h3>Hi-Lo</h3>
+                                <p>Beat the card dealer</p>
+                                <span class="multiplier">Up to 3x</span>
+                            </div>
+                            <div class="game-card" data-game="solo-blackjack">
+                                <div class="game-icon"><img src="assests/thumbs/blackjack.svg" class="game-thumb" alt="Blackjack"></div>
+                                <h3>Blackjack</h3>
+                                <p>Classic card game</p>
+                                <span class="multiplier">Up to 2.5x</span>
+                            </div>
+                            <div class="game-card" data-game="solo-tower">
+                                <div class="game-icon"><img src="assests/thumbs/tower.svg" class="game-thumb" alt="Tower"></div>
+                                <h3>Tower</h3>
+                                <p>Climb higher for bigger wins</p>
+                                <span class="multiplier">Up to 12x</span>
+                            </div>
+                            <div class="game-card" data-game="solo-moles">
+                                <div class="game-icon"><img src="assests/thumbs/moles.svg" class="game-thumb" alt="Moles"></div>
+                                <h3>Moles</h3>
+                                <p>Whack the moles</p>
+                                <span class="multiplier">Up to 8x</span>
+                            </div>
+                            <div class="game-card" data-game="solo-chicken">
+                                <div class="game-icon"><img src="assests/thumbs/chicken.svg" class="game-thumb" alt="Chicken"></div>
+                                <h3>Chicken</h3>
+                                <p>Catch the golden chickens</p>
+                                <span class="multiplier">Up to 5x</span>
+                            </div>
+                            <div class="game-card" data-game="solo-plinko">
+                                <div class="game-icon"><img src="assests/thumbs/plinko.svg" class="game-thumb" alt="Plinko"></div>
+                                <h3>Plinko</h3>
+                                <p>Watch the ball fall</p>
+                                <span class="multiplier">Up to 8x</span>
+                            </div>
+                            <div class="game-card" data-game="solo-keno">
+                                <div class="game-icon"><img src="assests/thumbs/keno.svg" class="game-thumb" alt="Keno"></div>
+                                <h3>Keno</h3>
+                                <p>Pick your lucky numbers</p>
+                                <span class="multiplier">Up to 15x</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Solo Games Tab -->
+                <div class="tab-pane" id="solo">
+                    <div class="games-list">
+                        <h2>Solo Games</h2>
+                        <div id="solo-games" class="games-container"></div>
+                    </div>
+                </div>
+
+                <!-- PvP Games Tab -->
+                <div class="tab-pane" id="pvp">
+                    <div class="games-list">
+                        <h2>Coming Soon: PvP Games</h2>
+                        <p>Head-to-head games with other players are coming soon!</p>
+                    </div>
+                </div>
+
+                <!-- Bets Tab -->
+                <div class="tab-pane" id="bets">
+                    <div class="bets-container">
+                        <h2>Bet History</h2>
+                        <div id="bets-list" class="bets-list"></div>
+                    </div>
+                </div>
+
+                <!-- Shop Tab -->
+                <div class="tab-pane" id="shop">
+                    <div class="shop-container">
+                        <h2>Shop</h2>
+                        <div class="shop-grid">
+                            <div class="shop-item">
+                                <h3>$10 Package</h3>
+                                <p class="price">$10</p>
+                                <button class="btn btn-small">Purchase</button>
+                            </div>
+                            <div class="shop-item">
+                                <h3>$50 Package</h3>
+                                <p class="price">$50</p>
+                                <p class="bonus">+$5 Bonus</p>
+                                <button class="btn btn-small">Purchase</button>
+                            </div>
+                            <div class="shop-item">
+                                <h3>$100 Package</h3>
+                                <p class="price">$100</p>
+                                <p class="bonus">+$15 Bonus</p>
+                                <button class="btn btn-small">Purchase</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Game Modal -->
+            <div id="gameModal" class="modal hidden">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="gameTitle">Game</h2>
+                        <button id="closeGameBtn" class="btn-close">&times;</button>
+                    </div>
+                    <div id="gameContainer" class="game-container">
+                        <!-- Game content inserted here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="assests/config.js"></script>
+    <script src="assests/api.js"></script>
+    <script src="assests/games/gameEngine.js"></script>
+    <script src="assests/games/solo/dice.js"></script>
+    <script src="assests/games/solo/wheel.js"></script>
+    <script src="assests/games/solo/crash.js"></script>
+    <script src="assests/games/solo/mines.js"></script>
+    <script src="assests/games/solo/hilo.js"></script>
+    <script src="assests/games/solo/blackjack.js"></script>
+    <script src="assests/games/solo/tower.js"></script>
+    <script src="assests/games/solo/moles.js"></script>
+    <script src="assests/games/solo/chicken.js"></script>
+    <script src="assests/games/solo/plinko.js"></script>
+    <script src="assests/games/solo/keno.js"></script>
+    <script src="assests/ui.js"></script>
+    <script src="assests/main.js"></script>
+</body>
+</html>
