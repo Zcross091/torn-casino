@@ -3,292 +3,197 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="color-scheme" content="dark">
-    <meta name="theme-color" content="#0b0f18">
-    <meta name="robots" content="noindex, nofollow, noarchive">
-    <title>Casino - Torn City Gaming</title>
-    <link rel="stylesheet" href="assests/styles.css">
+    <title>The Daily Torn Syndicate | Static Chronicles</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Retro Paper Feel -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400;1,700&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        .font-retro-title {
+            font-family: 'Special Elite', cursive, serif;
+        }
+        .font-retro-serif {
+            font-family: 'Playfair Display', Georgia, serif;
+        }
+        .font-typewriter {
+            font-family: 'Courier Prime', monospace;
+        }
+        /* Page texture overlay simulating wood-pulp paper */
+        body {
+            background-color: #f5eedc;
+            background-image: radial-gradient(rgba(0,0,0,0.03) 1.2px, transparent 0),
+                              radial-gradient(rgba(0,0,0,0.02) 1px, transparent 0);
+            background-size: 12px 12px;
+            background-position: 0 0, 6px 6px;
+        }
+        /* Custom scrollbar for typewriter feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #eae4d3;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #262626;
+            border-radius: 4px;
+        }
+        /* Dropcap utility */
+        .drop-cap::first-letter {
+            float: left;
+            font-family: 'Special Elite', cursive;
+            font-size: 4.5rem;
+            line-height: 3.5rem;
+            padding-right: 0.6rem;
+            padding-top: 0.3rem;
+            color: #1a1a1a;
+            font-weight: bold;
+        }
+        /* Paper card rotation animation */
+        .paper-lift {
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+        .paper-lift:hover {
+            transform: translateY(-4px) rotate(-0.5deg);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.12), 0 4px 8px rgba(0,0,0,0.06);
+            border-color: #000;
+            z-index: 10;
+        }
+        .paper-lift-right:hover {
+            transform: translateY(-4px) rotate(0.5deg);
+        }
+        /* Ticker animation */
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+        .animate-marquee {
+            animation: marquee 35s linear infinite;
+        }
+        /* Settings Panel Animation */
+        .settings-panel {
+            transition: max-height 0.4s ease-in-out, opacity 0.3s ease-in-out;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+        }
+        .settings-panel.open {
+            max-height: 300px;
+            opacity: 1;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+        }
+    </style>
 </head>
-<body>
-    <div id="app">
-        <div id="auth-container" class="hidden">
-            <div class="login-box">
-                <h1>🎰 Casino Login</h1>
-                <p>Enter your Torn City API key to get started</p>
-                <div class="form-group">
-                    <input type="password" id="apiKeyInput" placeholder="Your API Key" class="input">
-                    <button id="loginBtn" class="btn btn-primary">Login</button>
+<body class="text-neutral-900 font-retro-serif min-h-screen pb-16">
+
+    <!-- Top News Ticker -->
+    <div class="w-full bg-neutral-900 text-[#eae4d3] border-b-2 border-neutral-950 py-2.5 overflow-hidden relative shadow-md select-none">
+        <div id="ticker-container" class="flex whitespace-nowrap animate-marquee font-typewriter uppercase tracking-widest text-xs">
+            <span class="mx-4">⚠️ CITY POLICE REPORT MASS RUNS ON DRUG DEPOTS</span>
+            <span class="mx-4">⚡ SHADY TRANSACTIONS DETECTED IN COMMODITY SHARES</span>
+            <span class="mx-4">🔥 BOUNTY BOARD CAP RECENTLY EXCEEDED 50M IN CONTRACTS</span>
+            <span class="mx-4">🧪 PHARMACY CORNER SELLS OUT OF FIRST AID PLASTER</span>
+            <span class="mx-4">🌍 PASSPORT CONTROLS INCREASE SCRUTINY ON SECTOR 7 EXITS</span>
+            <!-- Duplicate for seamless looping -->
+            <span class="mx-4">⚠️ CITY POLICE REPORT MASS RUNS ON DRUG DEPOTS</span>
+            <span class="mx-4">⚡ SHADY TRANSACTIONS DETECTED IN COMMODITY SHARES</span>
+        </div>
+    </div>
+
+    <!-- Main Container representing physical newspaper -->
+    <div class="max-w-6xl mx-auto mt-8 bg-[#faf7ef] border-4 border-neutral-900 p-4 sm:p-8 shadow-2xl relative">
+        
+        <!-- Header / Masthead -->
+        <header class="border-b-4 border-neutral-900 pb-4 mb-6">
+            <!-- Masthead Top Info -->
+            <div class="flex flex-col sm:flex-row justify-between text-xs font-typewriter uppercase border-b border-neutral-800 pb-2 mb-4 text-neutral-600">
+                <div>Edition: <strong>STATIC CHRONICLES</strong></div>
+                <div>Vol. LXVII No. 303</div>
+                <div>Price: <strong>10 TORN POINTS</strong></div>
+            </div>
+
+            <!-- Big Vintage Title -->
+            <div class="text-center py-4">
+                <a href="index.html" class="inline-block hover:opacity-90">
+                    <h1 class="font-retro-title text-4xl sm:text-6xl md:text-7xl uppercase tracking-tighter leading-none text-neutral-950 select-none">
+                        The Daily Torn Syndicate
+                    </h1>
+                </a>
+                <p class="font-typewriter text-xs sm:text-sm uppercase tracking-widest text-neutral-700 mt-3 italic">
+                    "Decentralized, unblockable reporting direct from the Torn API to your screen."
+                </p>
+            </div>
+
+            <!-- Date & Status bar -->
+            <div class="border-t-4 border-b-2 border-neutral-900 py-2.5 flex flex-col md:flex-row justify-between items-center text-xs font-typewriter uppercase text-neutral-800">
+                <div class="mb-2 md:mb-0">
+                    📅 Date: <strong id="current-date">Fetching Date...</strong> | Torn City Time
                 </div>
-                <p class="help-text">Your API key stays secure and never leaves your browser</p>
+                <!-- Controls -->
+                <div class="flex items-center gap-4">
+                    <span id="data-status-indicator" class="flex items-center gap-1.5 font-bold">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span>
+                        Mock Data Mode
+                    </span>
+                    <button id="toggle-settings-btn" class="bg-neutral-900 text-[#f5eedc] px-3 py-1 hover:bg-neutral-800 transition-colors uppercase tracking-tight text-[10px] border border-neutral-950 font-bold cursor-pointer">
+                        ⚙️ Configure Node
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Hidden Settings Panel -->
+            <div id="settings-panel" class="settings-panel bg-neutral-200 border-x-2 border-b-2 border-neutral-900 px-6 font-typewriter text-xs">
+                <div class="max-w-2xl mx-auto flex flex-col sm:flex-row gap-4 items-end">
+                    <div class="flex-1 w-full">
+                        <label for="api_key_input" class="block font-bold mb-1 uppercase">🔑 Enter Torn API Key (Optional):</label>
+                        <input type="text" id="api_key_input" placeholder="e.g. ABCDEF1234567890" maxlength="16" class="w-full bg-[#faf7ef] border-2 border-neutral-800 p-2 uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <p class="text-[9px] text-neutral-500 mt-1">Key is saved securely in your browser's local storage and is never sent to any server. Leave blank to use simulated mock news.</p>
+                    </div>
+                    <button id="save-key-btn" class="bg-neutral-900 text-white font-bold uppercase px-4 py-2 border-2 border-neutral-950 hover:bg-neutral-800">
+                        Save & Restart Engine
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Category Filters -->
+        <section class="mb-8 border-b border-neutral-800 pb-6 flex flex-wrap gap-2 justify-center text-xs font-typewriter uppercase" id="filters-container">
+            <button data-filter="all" class="filter-btn px-3 py-2 border border-neutral-800 transition-all bg-neutral-900 text-white">📰 Full Chronicle</button>
+            <button data-filter="price_anomaly" class="filter-btn px-3 py-2 border border-neutral-800 transition-all hover:bg-neutral-900 hover:text-white">📈 Market Panics</button>
+            <button data-filter="hospitalization" class="filter-btn px-3 py-2 border border-neutral-800 transition-all hover:bg-neutral-900 hover:text-white">🚑 Casualty Reports</button>
+            <button data-filter="gym_train" class="filter-btn px-3 py-2 border border-neutral-800 transition-all hover:bg-neutral-900 hover:text-white">💪 Strength Feats</button>
+            <button data-filter="travel_flow" class="filter-btn px-3 py-2 border border-neutral-800 transition-all hover:bg-neutral-900 hover:text-white">✈️ Travel Exits</button>
+        </section>
+
+        <!-- Dynamic News Container -->
+        <div id="news-container">
+            <!-- Loading State -->
+            <div class="text-center py-20 border-b border-neutral-400" id="loading-state">
+                <span class="font-retro-title text-4xl block text-neutral-400 uppercase tracking-widest mb-4 animate-pulse">
+                    📡 TUNING THE WIRELESS...
+                </span>
+                <p class="font-typewriter text-xs text-neutral-600 leading-relaxed">
+                    Connecting to Torn City surveillance networks... Please hold.
+                </p>
             </div>
         </div>
 
-        <div id="casino-container" class="hidden">
-            <!-- Top Bar -->
-            <header class="top-bar">
-                <div class="casino-title">
-                    <h1>🎰 CASINO</h1>
-                </div>
-                <div class="user-info">
-                    <div class="balance-display">
-                        <span class="label">Balance:</span>
-                        <span class="amount" id="balanceAmount">$0</span>
-                    </div>
-                    <div class="user-details">
-                        <span id="username" class="username">Loading...</span>
-                        <div style="display: flex; gap: 8px;">
-                            <button id="dailyBonusBtn" class="btn-small" style="background: var(--primary); color: #000; border: none;">🎁 Daily Bonus</button>
-                            <button id="logoutBtn" class="btn-small">Logout</button>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <!-- Sidebar -->
-            <aside class="sidebar">
-                <div class="logo">
-                    <h2>CASINO</h2>
-                </div>
-                <nav class="side-nav">
-                    <button class="side-btn active" data-tab="lobby">Lobby</button>
-                    <button class="side-btn" data-tab="solo">Solo Games</button>
-                    <button class="side-btn" data-tab="pvp">PvP Games</button>
-                    <button class="side-btn" data-tab="leaderboard">Leaderboard</button>
-                    <button class="side-btn" data-tab="bets">Bets</button>
-                    <button class="side-btn" data-tab="shop">Shop</button>
-                </nav>
-                <div style="flex:1"></div>
-                <div class="theme-toggle">
-                    <button id="signInBtn" class="btn-small">Sign in</button>
-                </div>
-            </aside>
-
-            <!-- Tab Navigation (kept for compatibility) -->
-            <nav class="tab-nav">
-                <button class="tab-btn active" data-tab="lobby">🎯 Lobby</button>
-                <button class="tab-btn" data-tab="solo">🎮 Solo Games</button>
-                <button class="tab-btn" data-tab="pvp">⚔️ PvP Games</button>
-                <button class="tab-btn" data-tab="leaderboard">🏆 Leaderboard</button>
-                <button class="tab-btn" data-tab="bets">📊 Bets</button>
-                <button class="tab-btn" data-tab="shop">🛍️ Shop</button>
-            </nav>
-
-            <!-- Tab Content -->
-            <main class="tab-content">
-                <!-- Lobby Tab -->
-                <div class="tab-pane active" id="lobby">
-                    <div class="lobby-container">
-                        <div class="welcome-section">
-                            <h2>Welcome to the Casino!</h2>
-                            <p>Choose a game from below to start playing. The house takes a small rake on each game.</p>
-                        </div>
-                        <div class="game-grid">
-                            <div class="game-card" data-game="solo-dice">
-                                <div class="game-icon"><img src="assests/thumbs/dice.svg" class="game-thumb" alt="Dice"></div>
-                                <h3>Dice</h3>
-                                <p>Roll the dice and predict higher or lower</p>
-                                <span class="multiplier">Up to 6x</span>
-                            </div>
-                            <div class="game-card" data-game="solo-wheel">
-                                <div class="game-icon"><img src="assests/thumbs/wheel.svg" class="game-thumb" alt="Wheel"></div>
-                                <h3>Wheel</h3>
-                                <p>Spin the wheel and win big</p>
-                                <span class="multiplier">Up to 10x</span>
-                            </div>
-                            <div class="game-card" data-game="solo-crash">
-                                <div class="game-icon"><img src="assests/thumbs/crash.svg" class="game-thumb" alt="Crash"></div>
-                                <h3>Crash</h3>
-                                <p>Cash out before the crash</p>
-                                <span class="multiplier">Variable</span>
-                            </div>
-                            <div class="game-card" data-game="solo-mines">
-                                <div class="game-icon"><img src="assests/thumbs/mines.svg" class="game-thumb" alt="Mines"></div>
-                                <h3>Mines</h3>
-                                <p>Find gems and avoid the mines</p>
-                                <span class="multiplier">Up to 10x</span>
-                            </div>
-                            <div class="game-card" data-game="solo-hilo">
-                                <div class="game-icon"><img src="assests/thumbs/hilo.svg" class="game-thumb" alt="Hi-Lo"></div>
-                                <h3>Hi-Lo</h3>
-                                <p>Beat the card dealer</p>
-                                <span class="multiplier">Up to 3x</span>
-                            </div>
-                            <div class="game-card" data-game="solo-blackjack">
-                                <div class="game-icon"><img src="assests/thumbs/blackjack.svg" class="game-thumb" alt="Blackjack"></div>
-                                <h3>Blackjack</h3>
-                                <p>Classic card game</p>
-                                <span class="multiplier">Up to 2.5x</span>
-                            </div>
-                            <div class="game-card" data-game="solo-tower">
-                                <div class="game-icon"><img src="assests/thumbs/tower.svg" class="game-thumb" alt="Tower"></div>
-                                <h3>Tower</h3>
-                                <p>Climb higher for bigger wins</p>
-                                <span class="multiplier">Up to 12x</span>
-                            </div>
-                            <div class="game-card" data-game="solo-moles">
-                                <div class="game-icon"><img src="assests/thumbs/moles.svg" class="game-thumb" alt="Moles"></div>
-                                <h3>Moles</h3>
-                                <p>Whack the moles</p>
-                                <span class="multiplier">Up to 8x</span>
-                            </div>
-                            <div class="game-card" data-game="solo-chicken">
-                                <div class="game-icon"><img src="assests/thumbs/chicken.svg" class="game-thumb" alt="Chicken"></div>
-                                <h3>Chicken</h3>
-                                <p>Catch the golden chickens</p>
-                                <span class="multiplier">Up to 5x</span>
-                            </div>
-                            <div class="game-card" data-game="solo-plinko">
-                                <div class="game-icon"><img src="assests/thumbs/plinko.svg" class="game-thumb" alt="Plinko"></div>
-                                <h3>Plinko</h3>
-                                <p>Watch the ball fall</p>
-                                <span class="multiplier">Up to 8x</span>
-                            </div>
-                            <div class="game-card" data-game="solo-keno">
-                                <div class="game-icon"><img src="assests/thumbs/keno.svg" class="game-thumb" alt="Keno"></div>
-                                <h3>Keno</h3>
-                                <p>Pick your lucky numbers</p>
-                                <span class="multiplier">Up to 15x</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Solo Games Tab -->
-                <div class="tab-pane" id="solo">
-                    <div class="games-list">
-                        <h2>Solo Games</h2>
-                        <div id="solo-games" class="games-container"></div>
-                    </div>
-                </div>
-
-                <!-- PvP Games Tab -->
-                <div class="tab-pane" id="pvp">
-                    <div class="games-list">
-                        <h2>PvP Coinflip Lobbies</h2>
-                        
-                        <div class="lobby-controls" style="background: var(--card-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px;">
-                            <h3>Create Lobby</h3>
-                            <div style="display: flex; gap: 10px; margin-top: 10px;">
-                                <input type="number" id="coinflipAmount" placeholder="Bet Amount ($)" class="input" style="width: 150px;">
-                                <select id="coinflipSide" class="input" style="width: 120px;">
-                                    <option value="heads">Heads</option>
-                                    <option value="tails">Tails</option>
-                                </select>
-                                <button id="createCoinflipBtn" class="btn btn-primary">Create Coinflip</button>
-                            </div>
-                        </div>
-
-                        <h3>Open Lobbies</h3>
-                        <div id="pvp-lobbies-list" style="display: flex; flex-direction: column;">
-                            <p style="color: var(--text-secondary)">No open lobbies.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Bets Tab -->
-                <div class="tab-pane" id="bets">
-                    <div class="bets-container">
-                        <h2>Bet History</h2>
-                        <div id="bets-list" class="bets-list"></div>
-                    </div>
-                </div>
-
-                <!-- Leaderboard Tab -->
-                <div class="tab-pane" id="leaderboard">
-                    <div class="leaderboard-container">
-                        <h2>Top High Rollers</h2>
-                        <div style="background: var(--card-bg); padding: 20px; border-radius: 8px; margin-top: 15px;">
-                            <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                                <thead>
-                                    <tr style="border-bottom: 2px solid var(--border);">
-                                        <th style="padding: 10px;">Rank</th>
-                                        <th style="padding: 10px;">Player</th>
-                                        <th style="padding: 10px; text-align: right;">Total Wagered</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="leaderboard-list">
-                                    <tr><td colspan="3" style="text-align: center; padding: 20px;">Loading...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Shop Tab -->
-                <div class="tab-pane" id="shop">
-                    <div class="shop-container">
-                        <h2>Shop</h2>
-                        <div class="shop-grid">
-                            <div class="shop-item">
-                                <h3>$10 Package</h3>
-                                <p class="price">$10</p>
-                                <button class="btn btn-small">Purchase</button>
-                            </div>
-                            <div class="shop-item">
-                                <h3>$50 Package</h3>
-                                <p class="price">$50</p>
-                                <p class="bonus">+$5 Bonus</p>
-                                <button class="btn btn-small">Purchase</button>
-                            </div>
-                            <div class="shop-item">
-                                <h3>$100 Package</h3>
-                                <p class="price">$100</p>
-                                <p class="bonus">+$15 Bonus</p>
-                                <button class="btn btn-small">Purchase</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </main>
-
-            <!-- Game Modal -->
-            <div id="gameModal" class="modal hidden">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h2 id="gameTitle">Game</h2>
-                        <button id="closeGameBtn" class="btn-close">&times;</button>
-                    </div>
-                    <div id="gameContainer" class="game-container">
-                        <!-- Game content inserted here -->
-                    </div>
-                </div>
+        <!-- Footer -->
+        <footer class="border-t-4 border-neutral-900 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center text-xs font-typewriter text-neutral-600">
+            <div class="mb-4 md:mb-0 text-center md:text-left">
+                <p class="font-bold">© 2026 TORN TABLOID SYNDICATE COOP.</p>
+                <p>Decentralized client. All operations executed locally in-browser.</p>
             </div>
-        </div>
-    <!-- Chat Widget -->
-    <div id="chatWidget" style="position: fixed; bottom: 20px; right: 20px; width: 320px; background: rgba(26, 31, 46, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; display: none; flex-direction: column; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-        <div style="padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: bold; display: flex; justify-content: space-between;">
-            <span>💬 Global Chat</span>
-            <button onclick="document.getElementById('chatWidget').style.display='none'" style="background:none; border:none; color:var(--text); cursor:pointer;">_</button>
-        </div>
-        <div id="chatMessages" style="height: 250px; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; font-size: 13px;"></div>
-        <div style="padding: 10px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; gap: 8px;">
-            <input type="text" id="chatInput" placeholder="Type a message..." style="flex: 1; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.3); color: white;">
-            <button id="sendChatBtn" class="btn btn-primary" style="padding: 8px 12px;">Send</button>
-        </div>
-    </div>
-    
-    <!-- Floating Chat Toggle Button -->
-    <button id="toggleChatBtn" class="btn btn-primary" style="position: fixed; bottom: 20px; right: 20px; border-radius: 50%; width: 50px; height: 50px; font-size: 24px; display: none; align-items: center; justify-content: center; z-index: 999; box-shadow: 0 4px 15px rgba(0,255,0,0.3);">💬</button>
+            <div class="flex gap-4">
+                <a href="https://api.torn.com/v2/" target="_blank" class="underline hover:text-neutral-900 font-bold uppercase">Torn API v2</a>
+            </div>
+        </footer>
 
     </div>
 
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="assests/config.js"></script>
-    <script src="assests/api.js"></script>
-    <script src="assests/games/gameEngine.js"></script>
-    <script src="assests/games/solo/dice.js"></script>
-    <script src="assests/games/solo/wheel.js"></script>
-    <script src="assests/games/solo/crash.js"></script>
-    <script src="assests/games/solo/mines.js"></script>
-    <script src="assests/games/solo/hilo.js"></script>
-    <script src="assests/games/solo/blackjack.js"></script>
-    <script src="assests/games/solo/tower.js"></script>
-    <script src="assests/games/solo/moles.js"></script>
-    <script src="assests/games/solo/chicken.js"></script>
-    <script src="assests/games/solo/plinko.js"></script>
-    <script src="assests/games/solo/keno.js"></script>
-    <script src="assests/games/pvp/coinflip.js"></script>
-    <script src="assests/ui.js"></script>
-    <script src="assests/main.js"></script>
+    <!-- Application Logic -->
+    <script src="app.js"></script>
 </body>
 </html>
