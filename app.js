@@ -5,7 +5,7 @@
 // ==========================================
 // CONFIGURATION
 // Paste your Google Apps Script Web App URL here after deploying!
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzXs-2zY26io4CKzZR3w3A0_SStcrhryWR1J9cRA2_YRqoAaxAhXnIbQm7CDyjhkkkr/exec'; 
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzf4v5S77-zQrPhcaGMwv1zhxaXyf8d7DA2a1GCgT3t9JOikmWK_PB8Svp0LwLULEXG/exec'; 
 // ==========================================
 
 const STATE = {
