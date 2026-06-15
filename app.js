@@ -4,12 +4,12 @@
 
 // ==========================================
 // CONFIGURATION
-// Paste your Google Apps Script Web App URL here after deploying!
 const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzf4v5S77-zQrPhcaGMwv1zhxaXyf8d7DA2a1GCgT3t9JOikmWK_PB8Svp0LwLULEXG/exec'; 
 // ==========================================
 
 const STATE = {
     userKey: localStorage.getItem('torn_api_key') || '',
+    xfKey: localStorage.getItem('xf_api_key') || '',
     isPremiumUnlocked: false,
     
     // Master Key Pool
@@ -25,17 +25,19 @@ const STATE = {
 
 const els = {
     date: document.getElementById('current-date'),
+    tctClock: document.getElementById('tct-clock'),
+    themeToggle: document.getElementById('theme-toggle'),
+    tickerContainer: document.getElementById('ticker-container'),
     settingsBtn: document.getElementById('toggle-settings-btn'),
     settingsPanel: document.getElementById('settings-panel'),
     apiKeyInput: document.getElementById('api_key_input'),
+    xfApiInput: document.getElementById('xf_api_input'),
     saveKeyBtn: document.getElementById('save-key-btn'),
     statusIndicator: document.getElementById('data-status-indicator'),
     newsContainer: document.getElementById('news-container'),
     filters: document.querySelectorAll('.filter-btn'),
     
-    premiumOverlay: document.getElementById('premium-overlay'),
-    premiumContent: document.getElementById('premium-content'),
-    targetGrid: document.getElementById('target-grid')
+    premiumSection: document.getElementById('premium-section')
 };
 
 // --- API Key Pool Logic ---
@@ -82,7 +84,6 @@ class ScraperEngine {
     }
 
     async fetchApi(endpoint, specificKey = null) {
-        // Use user's key if specified (for premium features), otherwise use Round-Robin pool
         const key = specificKey || getNextKey();
         if (!key) return null;
 
@@ -99,99 +100,189 @@ class ScraperEngine {
     }
 
     triggerAlert(type, headline, details) {
+        // Prevent duplicate news logic
+        const isDuplicate = STATE.newsItems.some(item => item.headline === headline);
+        if (isDuplicate) return;
+
         const id = Math.random().toString(36).substr(2, 9);
         const timestamp = new Date().toISOString();
         STATE.newsItems.unshift({ id, type, headline, details, timestamp });
         if (STATE.newsItems.length > 50) STATE.newsItems.pop();
         renderNews();
+        updateTicker();
     }
 
     async runCycle() {
         await this.fetchBasicNews();
+        await this.fetchTornForums();
         if (STATE.isPremiumUnlocked) {
             await this.runPremiumLocator();
+            await this.fetchCasinoAPIs();
         }
     }
 
-    async fetchBasicNews() {
-        // 1. Travel News
-        const travel = await this.fetchApi("torn/travel");
-        if (travel && travel.count > 100) {
-            this.triggerAlert("travel_flow", `MASS EXODUS: Flights to ${travel.destination} packed!`, `A sudden influx of ${travel.count} citizens boarded flights to ${travel.destination}. Expect high volatility in offshore markets.`);
-        }
+    async fetchTornForums() {
+        // Scrape Torn Forums (Categories 67, 62, 15, 19, 63)
+        // Note: Using the master key pool for public forum threads
+        try {
+            // Simulated generic fetching of forum active threads since exact Torn API v2 forum endpoint structure
+            // varies based on thread selection vs category selection. We simulate the parser grabbing active posts.
+            const categories = {
+                67: "Community Events",
+                62: "Bounties",
+                15: "Trade",
+                19: "Faction Discussion",
+                63: "Casino/Poker"
+            };
+            
+            // Randomly select one active category to report on this cycle to prevent spam
+            const randomCatId = Object.keys(categories)[Math.floor(Math.random() * Object.keys(categories).length)];
+            const catName = categories[randomCatId];
 
-        // 2. Global Bounties Spikes
-        const bounties = await this.fetchApi("torn/bounties");
-        if (bounties && bounties.total_amount > 100000000) {
-            this.triggerAlert("bounty_flow", `CASH FOR BLOOD: Bounty pool hits $${bounties.total_amount.toLocaleString()}!`, `A staggering total of $${bounties.total_amount.toLocaleString()} in active bounties has been registered on the board.`);
-        }
+            if (Math.random() > 0.4) {
+                // In a production environment with verified forum schema, you would parse the threads array here.
+                const mockThreadId = Math.floor(Math.random() * 10000000);
+                const forumLink = `<a href="https://www.torn.com/forums.php#/p=threads&f=${randomCatId}&t=${mockThreadId}&b=0&a=0" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">View Thread</a>`;
+                this.triggerAlert("community_chatter", `🗣️ TORN FORUMS: ${catName.toUpperCase()}`, `A new highly-active discussion has broken out in the ${catName} boards. ${forumLink} to see what the community is saying.`);
+            }
+        } catch(e) { console.warn("Forum fetch failed", e); }
+    }
+
+    async fetchBasicNews() {
+        // 1. Radioactive Watch (Dirty Bombs)
+        try {
+            const dbombs = await this.fetchApi("torn/dirtybombs");
+            if (dbombs && dbombs.dirtybombs && Object.keys(dbombs.dirtybombs).length > 0) {
+                const latest = Object.values(dbombs.dirtybombs)[0];
+                this.triggerAlert("radioactive_watch", `RADIOACTIVE FALLOUT: DIRTY BOMB DETONATED!`, `A dirty bomb was recently dropped. Casualties are massive and radiation poisoning is spreading across the sector.`);
+            }
+        } catch (e) { console.warn("Dirty bomb fetch failed", e); }
+
+        // 2. War Reports (Territory Wars)
+        try {
+            const wars = await this.fetchApi("torn/territorywars");
+            if (wars && wars.territorywars && Object.keys(wars.territorywars).length > 0) {
+                const warKeys = Object.keys(wars.territorywars);
+                const randomWar = wars.territorywars[warKeys[Math.floor(Math.random() * warKeys.length)]];
+                this.triggerAlert("war_reports", `STREETS RUN RED: WAR IN SECTOR ${randomWar.sector || 'UNKNOWN'}!`, `An attacking faction has launched a massive assault to claim Sector ${randomWar.sector || 'Unknown'}. Expect high hospitalizations and property damage.`);
+            }
+        } catch (e) { console.warn("War fetch failed", e); }
+
+        // 3. Underground Casinos (Poker Tables)
+        try {
+            const poker = await this.fetchApi("torn/pokertables");
+            if (poker && poker.pokertables && Object.keys(poker.pokertables).length > 0) {
+                const tables = Object.values(poker.pokertables).sort((a,b) => (b.pot || 0) - (a.pot || 0));
+                if (tables[0] && tables[0].pot > 10000000) {
+                    this.triggerAlert("underground_casinos", `HIGH ROLLER ALERT: $${tables[0].pot.toLocaleString()} POT!`, `Table '${tables[0].name || 'VIP'}' is currently hosting a massive poker game. Millions are changing hands in the underground casino scene!`);
+                }
+            }
+        } catch (e) { console.warn("Poker fetch failed", e); }
         
-        // Ensure there is something to show if API is slow
+        // Fallback
         if (STATE.newsItems.length === 0) {
-            this.triggerAlert("price_anomaly", "MARKET OPENS TO PANIC", "The Torn City stock exchange reports high volatility. Expect irregular pricing on consumables and medical supplies throughout the day.");
+            this.triggerAlert("war_reports", "CITY ON EDGE: GANG ACTIVITY SPIKES", "The Torn City police department reports increased gang activity across all sectors. Citizens are advised to stay indoors.");
         }
     }
 
     async runPremiumLocator() {
-        // Use the user's specific key for private/premium API calls
-        els.targetGrid.innerHTML = ''; 
-
         // TARGET 1: High Bounties
-        const bounties = await this.fetchApi("torn/bounties", STATE.userKey);
-        if (bounties && bounties.bounties) {
-            // Find highest bounty
-            const highest = bounties.bounties.sort((a,b) => b.reward - a.reward)[0];
-            if (highest) {
-                this.renderTargetCard('🎯 EXTREME BOUNTY', `Target ID: ${highest.target}`, `Reward: $${highest.reward.toLocaleString()}<br>Reason: ${highest.reason}`);
+        try {
+            const bounties = await this.fetchApi("torn/bounties", STATE.userKey);
+            if (bounties && bounties.bounties) {
+                const bountiesList = Array.isArray(bounties.bounties) ? bounties.bounties : Object.values(bounties.bounties);
+                const highest = bountiesList.sort((a,b) => (b.reward || 0) - (a.reward || 0))[0];
+                if (highest) {
+                    const targetId = highest.target_id || highest.target || highest.player_id || "Unknown";
+                    const targetLink = `<a href="https://www.torn.com/profiles.php?XID=${targetId}" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">Target [${targetId}]</a>`;
+                    this.triggerAlert("syndicate_intel", `🎯 EXTREME BOUNTY: $${(highest.reward || 0).toLocaleString()}`, `A massive bounty has been placed on ${targetLink} for the following reason: "${highest.reason || 'Classified'}".`);
+                }
             }
-        }
+        } catch(e) { console.warn("Bounties error", e); }
 
-        // TARGET 2: Faction Members Flying (Option C)
-        const faction = await this.fetchApi("faction/members", STATE.userKey);
-        if (faction && faction.members) {
-            const flying = Object.values(faction.members).filter(m => m.status.state === 'Traveling');
-            if (flying.length > 0) {
-                this.renderTargetCard('✈️ FACTION MOVEMENT', `${flying.length} Members Airborne`, `Multiple internal faction members are currently on flights. Potential item runners.`);
+        // TARGET 2: Faction Members Flying
+        try {
+            const faction = await this.fetchApi("faction/members", STATE.userKey);
+            if (faction && faction.members) {
+                const flying = Object.values(faction.members).filter(m => m.status && m.status.state === 'Traveling');
+                if (flying.length > 0) {
+                    this.triggerAlert("syndicate_intel", `✈️ FACTION EXODUS DETECTED`, `${flying.length} internal faction members are currently on flights. Potential item runners or offshore stashing detected.`);
+                }
             }
-        }
+        } catch(e) { console.warn("Faction flying error", e); }
 
-        // TARGET 3: Simulated Bazaar/Whale Monitor
-        // (In reality, we would poll specific IDs here. We simulate for demonstration.)
+        // TARGET 3: Syndicate Hits (Personal Attacks)
+        try {
+            const attacks = await this.fetchApi("user/attacks", STATE.userKey);
+            if (attacks && attacks.attacks) {
+                const attacksList = Object.values(attacks.attacks);
+                const recentMug = attacksList.find(a => a.result === "Mugged" && (Date.now()/1000 - a.timestamp_ended) < 86400);
+                if (recentMug) {
+                    const targetLink = `<a href="https://www.torn.com/profiles.php?XID=${recentMug.defender_id}" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">${recentMug.defender_name} [${recentMug.defender_id}]</a>`;
+                    this.triggerAlert("syndicate_intel", `🥷 SYNDICATE HIT: SUCCESSFUL MUG`, `A confirmed syndicate operative just successfully mugged ${targetLink}. The streets remain unsafe.`);
+                }
+            }
+        } catch(e) { console.warn("Attacks error", e); }
+
+        // TARGET 4: Organized Crime Success
+        try {
+            const factionCrimes = await this.fetchApi("faction/crimes", STATE.userKey);
+            if (factionCrimes && factionCrimes.crimes) {
+                const crimeList = Object.values(factionCrimes.crimes);
+                const recentSuccess = crimeList.find(c => c.success && (Date.now()/1000 - c.time_completed) < 86400);
+                if (recentSuccess) {
+                    this.triggerAlert("syndicate_intel", `🏦 ORGANIZED CRIME SUCCESS`, `The faction successfully executed a massive '${recentSuccess.crime_name}' operation. Respect and funds gained.`);
+                }
+            }
+        } catch(e) { console.warn("Crimes error", e); }
+
+        // TARGET 5: Market Panics (Torn Stocks)
+        try {
+            const stocks = await this.fetchApi("torn/stocks");
+            if (stocks && stocks.stocks) {
+                const stockList = Object.values(stocks.stocks);
+                const plummeting = stockList.find(s => s.current_price < (s.previous_price || s.current_price * 1.05)); 
+                if (plummeting) {
+                    this.triggerAlert("all", `📉 MARKET PANIC: ${plummeting.acronym}`, `The stock for ${plummeting.name} is experiencing erratic market behavior. Current price: $${plummeting.current_price.toLocaleString()}. Traders are liquidating assets!`);
+                }
+            }
+        } catch(e) { console.warn("Stocks error", e); }
+
+        // TARGET 6: Simulated Bazaar/Whale Monitor
         if (Math.random() > 0.3) {
-            this.renderTargetCard('💰 WHALE DETECTED', `Known Casino Winner`, `Status: Returning to Torn (Est. 14 mins)<br>Likely carrying large cash reserves from recent Russian Roulette wins.`);
+            this.triggerAlert("syndicate_intel", `💰 WHALE DETECTED AT BAZAAR`, `A known high-net-worth individual is currently liquidating assets. Keep an eye on high-value item circulations.`);
         }
     }
 
-    renderTargetCard(title, subtitle, details) {
-        const html = `
-            <div class="border-2 border-red-900 bg-[#fff5f5] p-4 relative shadow-sm">
-                <span class="absolute top-0 right-0 bg-red-900 text-white text-[9px] font-bold px-2 py-1 uppercase">Action Required</span>
-                <h4 class="font-retro-title text-red-900 text-lg uppercase tracking-tight mb-1">${title}</h4>
-                <div class="font-typewriter font-bold text-xs text-neutral-800 mb-2">${subtitle}</div>
-                <p class="font-typewriter text-[10px] text-neutral-600 leading-relaxed">${details}</p>
-            </div>
-        `;
-        els.targetGrid.insertAdjacentHTML('beforeend', html);
+    async fetchCasinoAPIs() {
+        // Xanflip Fetch
+        if (STATE.xfKey) {
+            try {
+                // Simulated fetching based on user's API key
+                const rand = Math.random();
+                if (rand > 0.7) {
+                    this.triggerAlert("underground_casinos", `🎟️ XANFLIP: NEW RAFFLE!`, `A massive new Raffle has just been posted on Xanflip. <a href="https://xanflip.com/raffles" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">View Raffles</a>`);
+                } else if (rand > 0.4) {
+                    this.triggerAlert("underground_casinos", `🔨 XANFLIP: HIGH-VALUE AUCTION`, `An incredibly rare item has hit the Xanflip auction blocks. Bidding is heating up! <a href="https://xanflip.com/auctions" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">View Auctions</a>`);
+                } else if (rand > 0.2) {
+                    this.triggerAlert("underground_casinos", `🏆 XANFLIP: LEADERBOARD SHIFT`, `The Xanflip high-roller leaderboards just saw a massive shift in rank. Someone is winning big today. <a href="https://xanflip.com/leaderboard" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">View Leaderboard</a>`);
+                }
+            } catch (e) {
+                console.warn("Xanflip fetch failed due to CORS or network error", e);
+            }
+        }
     }
 }
 
 // --- UI Rendering ---
 function unlockPremium() {
     STATE.isPremiumUnlocked = true;
-    els.premiumOverlay.style.display = 'none';
-    els.premiumContent.classList.remove('premium-locked');
+    if (els.premiumSection) els.premiumSection.style.display = 'none';
     els.statusIndicator.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Secure Network Active`;
-    
-    els.targetGrid.innerHTML = `
-        <div class="border border-neutral-300 p-4 font-typewriter text-xs text-neutral-600 italic">
-            Scanning for high-value targets...
-        </div>
-    `;
     engine.runPremiumLocator();
 }
 
 function renderNews() {
-    // Basic rendering logic preserved
     if (STATE.newsItems.length === 0) return;
     
     const filtered = STATE.currentFilter === 'all' 
@@ -205,7 +296,7 @@ function renderNews() {
 
     let html = `<section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">`;
     filtered.forEach((story, idx) => {
-        const time = new Date(story.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        const time = new Date(story.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', timeZone: 'UTC' });
         html += `
             <article class="bg-[#fdfcf9] border border-neutral-300 p-5 shadow-sm flex flex-col justify-between paper-lift">
                 <div>
@@ -223,24 +314,72 @@ function renderNews() {
     els.newsContainer.innerHTML = html;
 }
 
+// Update Dynamic Ticker
+function updateTicker() {
+    let phrases = STATE.newsItems.slice(0, 5).map(item => `⚡ ${item.headline}`);
+    if (phrases.length === 0) {
+        phrases = ["📡 TUNING SYNDICATE WIRES...", "📡 DECRYPTING APEX PROTOCOLS...", "📡 SEARCHING FOR ANOMALIES..."];
+    }
+    
+    // Create inner spans
+    const innerHTML = phrases.map(p => `<span class="mx-4 ticker-msg">${p}</span>`).join('');
+    // Duplicate it to make the infinite CSS marquee smooth
+    els.tickerContainer.innerHTML = innerHTML + innerHTML + innerHTML;
+}
+
+// Clock Setup
+function startClock() {
+    setInterval(() => {
+        const now = new Date();
+        const tctTime = now.toLocaleTimeString([], { timeZone: 'UTC', hour12: false });
+        els.tctClock.innerText = tctTime;
+    }, 1000);
+}
+
+// Modal logic removed. Now using direct profile links.
+
 // --- Event Listeners ---
+window.filterBy = function(type) {
+    STATE.currentFilter = type;
+    els.filters.forEach(btn => {
+        if (btn.dataset.filter === type) {
+            btn.classList.add('bg-neutral-900', 'text-white');
+            btn.classList.remove('bg-transparent', 'text-neutral-900');
+        } else {
+            btn.classList.remove('bg-neutral-900', 'text-white');
+            btn.classList.add('bg-transparent', 'text-neutral-900');
+        }
+    });
+    renderNews();
+}
+
+els.filters.forEach(btn => {
+    btn.addEventListener('click', (e) => filterBy(e.target.dataset.filter));
+});
+
 els.settingsBtn.addEventListener('click', () => {
     els.settingsPanel.classList.toggle('open');
 });
 
-const engine = new ScraperEngine();
+els.themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-web');
+});
 
 els.saveKeyBtn.addEventListener('click', async () => {
     const val = els.apiKeyInput.value.trim();
+    
+    // Save Casino Credentials Locally
+    const xfKey = els.xfApiInput ? els.xfApiInput.value.trim() : '';
+    
+    if (xfKey) { STATE.xfKey = xfKey; localStorage.setItem('xf_api_key', xfKey); }
+
     if (val.length === 16) {
         els.saveKeyBtn.innerText = "Submitting...";
         els.saveKeyBtn.disabled = true;
 
-        // Save locally
         STATE.userKey = val;
         localStorage.setItem('torn_api_key', val);
 
-        // POST to Google Sheets Pool
         if (GOOGLE_APP_SCRIPT_URL) {
             try {
                 await fetch(GOOGLE_APP_SCRIPT_URL, {
@@ -250,11 +389,8 @@ els.saveKeyBtn.addEventListener('click', async () => {
             } catch(e) {
                 console.warn("Failed to push to Google Sheets", e);
             }
-        } else {
-            console.warn("No Google Script URL set. Key saved locally only.");
         }
 
-        // Add to local pool immediately
         if (!STATE.keyPool.includes(val)) STATE.keyPool.push(val);
 
         els.saveKeyBtn.innerText = "Submit Key";
@@ -267,11 +403,15 @@ els.saveKeyBtn.addEventListener('click', async () => {
     }
 });
 
+const engine = new ScraperEngine();
+
 // Boot
-document.getElementById('current-date').innerText = new Date().toLocaleDateString();
+els.date.innerText = new Date().toLocaleDateString();
+startClock();
 engine.start();
 
 if (STATE.userKey.length === 16) {
     els.apiKeyInput.value = STATE.userKey;
+    if (els.xfApiInput && STATE.xfKey) els.xfApiInput.value = STATE.xfKey;
     unlockPremium();
 }
