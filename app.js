@@ -247,7 +247,9 @@ class ScraperEngine {
 
         // TARGET 6: Simulated Bazaar/Whale Monitor
         if (Math.random() > 0.3) {
-            this.triggerAlert("syndicate_intel", `💰 WHALE DETECTED AT BAZAAR`, `A known high-net-worth individual is currently liquidating assets. Keep an eye on high-value item circulations.`);
+            const mockWhaleId = Math.floor(Math.random() * 500000) + 2000000;
+            const targetLink = `<a href="https://www.torn.com/profiles.php?XID=${mockWhaleId}" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">Target [${mockWhaleId}]</a>`;
+            this.triggerAlert("syndicate_intel", `💰 WHALE DETECTED AT BAZAAR`, `${targetLink}, a flagged high-net-worth individual, is currently liquidating massive assets in their bazaar. Keep an eye on their high-value item circulations.`);
         }
     }
 
