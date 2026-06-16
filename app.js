@@ -12,7 +12,7 @@ const STATE = {
     xfKey: localStorage.getItem('xf_api_key') || '',
     
     // Master Key Pool
-    keyPool: ['lMzaRITl5w3eQY9d'], 
+    keyPool: [], 
     currentKeyIndex: 0,
 
     newsItems: [],
@@ -49,8 +49,8 @@ async function fetchKeyPool() {
         const res = await fetch(GOOGLE_APP_SCRIPT_URL);
         const data = await res.json();
         if (data.keys && data.keys.length > 0) {
-            // Merge hardcoded key with sheet keys, remove duplicates
-            STATE.keyPool = [...new Set(['lMzaRITl5w3eQY9d', ...data.keys])];
+            // Merge with existing pool, remove duplicates
+            STATE.keyPool = [...new Set([...STATE.keyPool, ...data.keys])];
             console.log(`Loaded ${STATE.keyPool.length} keys into the Round-Robin pool.`);
         }
     } catch (e) {
