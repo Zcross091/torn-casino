@@ -22,6 +22,13 @@ const STATE = {
     traders: [1, 2, 3], // Dummy IDs for whales
 };
 
+const CUSTOM_ADS = [
+    // Add custom banner objects here. Only the developer can modify this array.
+    // Ads can be in apng, webp, gif, etc.
+    // { image: "banner.gif", link: "https://www.torn.com/" }
+];
+let currentAdIndex = 0;
+
 const els = {
     date: document.getElementById('current-date'),
     tctClock: document.getElementById('tct-clock'),
@@ -118,11 +125,45 @@ class ScraperEngine {
             this.updateCalendar();
 
             // Fetch public news via rotating Master Pool
+            await this.fetchHitlist();
             await this.fetchBasicNews();
             await this.fetchTornForums();
             await this.runPremiumLocator();
             await this.fetchCasinoAPIs();
         } catch(e) { console.error(e); }
+    }
+
+    async fetchHitlist() {
+        const hitlistContainer = document.getElementById('hitlist-container');
+        if (!hitlistContainer) return;
+
+        try {
+            const data = await this.fetchApi("torn/bounties");
+            if (data && data.bounties) {
+                const bounties = Object.values(data.bounties);
+                // Sort by highest reward
+                bounties.sort((a, b) => b.reward - a.reward);
+                
+                // Get top 3
+                const topBounties = bounties.slice(0, 3);
+                
+                if (topBounties.length > 0) {
+                    hitlistContainer.innerHTML = topBounties.map(b => `
+                        <div class="flex-1 text-center py-2 px-4 hover:bg-red-50 transition-colors w-full">
+                            <div class="text-[10px] font-bold text-red-900 uppercase">Target [${b.target_id}]</div>
+                            <div class="text-xl font-retro-title text-red-700 tracking-tighter my-1">$${b.reward.toLocaleString()}</div>
+                            <div class="text-[9px] font-typewriter text-neutral-600">Listed for: ${b.listed_for} min</div>
+                            <a href="https://www.torn.com/bounties.php?p=main&step=custom&user=${b.target_id}" target="_blank" class="text-[10px] font-bold text-blue-600 hover:underline mt-1 inline-block">Hunt Target ↗</a>
+                        </div>
+                    `).join('');
+                } else {
+                    hitlistContainer.innerHTML = `<div class="text-xs font-typewriter text-neutral-600 py-4 w-full text-center">No active bounties high enough to warrant syndicate attention.</div>`;
+                }
+            }
+        } catch (e) {
+            console.warn("Hitlist error", e);
+            hitlistContainer.innerHTML = `<div class="text-xs font-typewriter text-red-600 py-4 w-full text-center">Connection to bounty board lost.</div>`;
+        }
     }
 
     async fetchTornForums() {
@@ -490,10 +531,33 @@ function detectDevice() {
     console.log(`[Syndicate Diagnostic] Device fingerprint identified: ${type} (Width: ${width}px)`);
 }
 
+function rotateAds() {
+    const adImg = document.getElementById('ad-banner-img');
+    const adLink = document.getElementById('ad-banner-link');
+    const adPlaceholder = document.getElementById('ad-banner-placeholder');
+
+    if (!adImg || !adLink || !adPlaceholder) return;
+
+    if (CUSTOM_ADS.length > 0) {
+        const ad = CUSTOM_ADS[currentAdIndex];
+        adImg.src = ad.image;
+        adLink.href = ad.link;
+        adImg.classList.remove('hidden');
+        adPlaceholder.classList.add('hidden');
+        
+        currentAdIndex = (currentAdIndex + 1) % CUSTOM_ADS.length;
+    } else {
+        adImg.classList.add('hidden');
+        adPlaceholder.classList.remove('hidden');
+    }
+}
+
 // Boot
 els.date.innerText = new Date().toLocaleDateString();
 startClock();
 detectDevice();
+rotateAds();
+setInterval(rotateAds, 10000); // Rotate ads every 10 seconds
 engine.start();
 
 if (STATE.userKey.length === 16) {
