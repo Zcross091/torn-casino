@@ -4,7 +4,7 @@
 
 // ==========================================
 // CONFIGURATION
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeBqpl4wIiaNMSoXWakQqRjM9s1QtSIb2NMA06FFwjYFFtU1Zf83I_4-6lAdw42QOO/exec'; 
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLT0OBhhoa8TXb82NRwPV_KaPrPY_LNdlfeZQyU3Q9-bXpywtfONq22d6z7AwogRvC/exec'; 
 // ==========================================
 
 const STATE = {
@@ -57,11 +57,14 @@ class ScraperEngine {
 
     async fetchApi(endpoint, specificKey = null) {
         try {
-            // Personal Key: Connect directly to Torn API
+            // Personal Key: Connect directly to Torn API (v1 format)
             if (specificKey) {
-                const res = await fetch(`https://api.torn.com/v2/${endpoint}`, {
-                    headers: { 'Authorization': `ApiKey ${specificKey}` }
-                });
+                const parts = endpoint.split('/');
+                const cat = parts[0] || '';
+                const sel = parts[1] || '';
+                const url = `https://api.torn.com/${cat}/?selections=${sel}&key=${specificKey}`;
+                
+                const res = await fetch(url);
                 if (!res.ok) throw new Error(`API returned ${res.status}`);
                 return await res.json();
             }
@@ -72,7 +75,7 @@ class ScraperEngine {
                 const res = await fetch(proxyUrl);
                 if (!res.ok) throw new Error(`Proxy returned ${res.status}`);
                 const data = await res.json();
-                if (data.error) throw new Error(`Proxy Error: ${data.error}`);
+                if (data.error) throw new Error(`Proxy Error: ${data.error.error || JSON.stringify(data.error)}`);
                 return data;
             }
 
