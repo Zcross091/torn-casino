@@ -4,7 +4,7 @@
 
 // ==========================================
 // CONFIGURATION
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxuBahjhVD1zwdnJeqjynLA6Qf59_yepdaTl-2utqbMJbjM-DgF8RLavEAsVXHZAMLv/exec'; 
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwuMbA0SOt49s7s2b7NgQnUAWUThHn4W22y7X59KTXc1WuYysl3q7bLJdTVcvX-XQ-D/exec'; 
 // ==========================================
 
 const STATE = {
