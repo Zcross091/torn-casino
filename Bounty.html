@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syndicate Contracts | Escrow Placement</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        .font-retro-title { font-family: 'Special Elite', cursive, serif; }
+        .font-retro-serif { font-family: 'Playfair Display', Georgia, serif; }
+        .font-typewriter { font-family: 'Courier Prime', monospace; }
+
+        body {
+            background-color: #f5eedc;
+            background-image: radial-gradient(rgba(0, 0, 0, 0.03) 1.2px, transparent 0),
+                radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 0);
+            background-size: 12px 12px;
+            background-position: 0 0, 6px 6px;
+        }
+
+        body.dark-web {
+            background-color: #050505;
+            background-image: none;
+            color: #00ff41;
+        }
+
+        body.dark-web .bg-\[\#faf7ef\] { background-color: #0a0a0a; border-color: #333; }
+        body.dark-web .border-neutral-900 { border-color: #00ff41; }
+        body.dark-web .text-neutral-900, body.dark-web .text-neutral-950 { color: #00ff41; }
+        body.dark-web .bg-neutral-900 { background-color: #00ff41; color: #000; }
+        body.dark-web input, body.dark-web textarea { background-color: #111; color: #00ff41; border-color: #00ff41; }
+    </style>
+</head>
+
+<body class="text-neutral-900 font-retro-serif min-h-screen pb-16 transition-colors dark-web">
+
+    <div class="w-[98%] md:w-[95%] max-w-4xl mx-auto mt-8 bg-[#faf7ef] border-4 border-neutral-900 p-6 shadow-2xl relative">
+        <div class="border-b-4 border-neutral-900 pb-4 mb-6">
+            <a href="index.html" class="text-xs font-typewriter uppercase hover:underline mb-4 inline-block">&larr; Return to Main Feed</a>
+            <h1 class="font-retro-title text-4xl uppercase tracking-tighter text-neutral-950 text-center">
+                Syndicate Contracts
+            </h1>
+            <p class="font-typewriter text-xs text-center mt-2 uppercase tracking-widest text-neutral-600">
+                Anonymous Escrow Placement Portal
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Form Section -->
+            <div class="font-typewriter space-y-4" id="bounty-form-container">
+                <div>
+                    <label class="block text-xs font-bold uppercase mb-1">Target ID</label>
+                    <input type="number" id="targetId" class="w-full border-2 border-neutral-900 bg-transparent p-2 text-sm focus:outline-none" placeholder="e.g. 123456" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase mb-1">Target Name</label>
+                    <input type="text" id="targetName" class="w-full border-2 border-neutral-900 bg-transparent p-2 text-sm focus:outline-none" placeholder="e.g. Duke" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase mb-1">Reward (Torn Cash)</label>
+                    <input type="number" id="reward" class="w-full border-2 border-neutral-900 bg-transparent p-2 text-sm focus:outline-none" placeholder="e.g. 5000000" required>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase mb-1">Reason / Context</label>
+                    <textarea id="reason" class="w-full border-2 border-neutral-900 bg-transparent p-2 text-sm focus:outline-none h-24" placeholder="e.g. Bazaar Undercutting..." required></textarea>
+                </div>
+                <button id="submitBtn" class="w-full bg-red-700 text-white hover:bg-neutral-900 font-bold uppercase p-3 text-sm transition-colors border-2 border-transparent">
+                    Generate Escrow Contract
+                </button>
+            </div>
+
+            <!-- Instructions Section -->
+            <div class="bg-neutral-100 p-4 border-2 border-neutral-900 font-typewriter text-xs relative dark-web:bg-[#111]">
+                <h3 class="font-bold uppercase mb-3 text-sm border-b border-neutral-300 pb-2">How Escrow Works</h3>
+                <ul class="space-y-3 leading-relaxed">
+                    <li>1. Fill out the target details and click "Generate Contract".</li>
+                    <li>2. You will receive a unique 4-character Escrow Token (e.g. <strong>TX-A1B2</strong>).</li>
+                    <li>3. Log into Torn and click the "Send Cash" or "Send Item" button on the Escrow Holder's profile.</li>
+                    <li>4. <strong>CRITICAL:</strong> You MUST put your unique Escrow Token in the message box when sending the item/cash!</li>
+                    <li>5. Our automated backend scans the Escrow logs every 2-3 minutes. Once the payment is verified, your bounty instantly goes live on the front page.</li>
+                </ul>
+
+                <!-- Success State Overlay -->
+                <div id="success-overlay" class="absolute inset-0 bg-neutral-900 text-white p-6 hidden flex-col items-center justify-center text-center dark-web:bg-black dark-web:text-[#00ff41]">
+                    <div class="text-green-500 font-bold text-lg mb-2">CONTRACT GENERATED</div>
+                    <p class="mb-4">Your escrow token is:</p>
+                    <div id="token-display" class="text-4xl font-black tracking-widest text-red-500 bg-neutral-800 p-4 mb-4 border border-red-500">TX-XXXX</div>
+                    <p class="text-[10px] mb-4">Send the reward item/cash to the Escrow Holder with this exact token as the message to activate the bounty.</p>
+                    <a href="index.html" class="underline hover:text-red-400">Return to Feed</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        document.getElementById('submitBtn').addEventListener('click', async () => {
+            const targetId = document.getElementById('targetId').value;
+            const targetName = document.getElementById('targetName').value;
+            const reward = document.getElementById('reward').value;
+            const reason = document.getElementById('reason').value;
+
+            if (!targetId || !targetName || !reward || !reason) {
+                alert("All fields are required."); return;
+            }
+
+            const btn = document.getElementById('submitBtn');
+            btn.innerText = "Processing...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch(GOOGLE_APP_SCRIPT_URL, {
+                    method: "POST",
+                    body: JSON.stringify({
+                        action: "submitBounty",
+                        targetId, targetName, reward, reason
+                    })
+                });
+                
+                const data = await response.json();
+                if (data.status === "success") {
+                    document.getElementById('token-display').innerText = data.token;
+                    document.getElementById('success-overlay').classList.remove('hidden');
+                    document.getElementById('success-overlay').classList.add('flex');
+                } else {
+                    alert("Error generating contract: " + data.msg);
+                    btn.innerText = "Generate Escrow Contract";
+                    btn.disabled = false;
+                }
+            } catch(e) {
+                alert("Network error.");
+                btn.innerText = "Generate Escrow Contract";
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

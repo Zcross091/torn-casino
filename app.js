@@ -4,7 +4,7 @@
 
 // ==========================================
 // CONFIGURATION
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxAA8zFdMVJpc-jtkvBavRmxf_JAD7gL79gVmL0gVVBAl3rlYotdl0gFPosxDhIrPvl/exec';
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzyd1j8Hs39XLGjtjtz3rhapkGnoF9bdpnnsYsvLJC2OZgP1ovCnqba0O14Wa8E6JO3/exec';
 // ==========================================
 
 const STATE = {
@@ -588,3 +588,47 @@ if (STATE.userKey.length === 16) {
     if (els.xfApiInput && STATE.xfKey) els.xfApiInput.value = STATE.xfKey;
     activateSecureNetwork();
 }
+
+// ============================================================================
+// DYNAMIC WIRE LAYER - PORTRAIT ASSIGNMENTS (SERVERLESS ESCROW)
+// ============================================================================
+async function pollSyndicateContracts() {
+    const portraitContainer = document.getElementById('left-portrait-bounty-list');
+    if (!portraitContainer) return;
+
+    try {
+        const response = await fetch(`${GOOGLE_APP_SCRIPT_URL}?endpoint=bounties`);
+        const packet = await response.json();
+        
+        if (packet.bounties) {
+            const activeContracts = packet.bounties;
+            
+            if (activeContracts.length === 0) {
+                portraitContainer.innerHTML = `<div class="text-[10px] text-center text-neutral-500 py-4 italic">No private underworld assignments currently active.</div>`;
+                return;
+            }
+
+            portraitContainer.innerHTML = activeContracts.slice(0, 4).map(b => `
+                <div class="pt-2 flex flex-col justify-between text-xs">
+                    <div class="flex justify-between items-start font-bold">
+                        <span class="text-neutral-950 uppercase text-[11px]">${b.targetName}</span>
+                        <span class="text-red-700 dark-web:text-[#00ff41] font-mono font-black">$${parseInt(b.reward).toLocaleString()}</span>
+                    </div>
+                    <div class="text-[10px] text-neutral-600 mt-0.5 italic line-clamp-1">"${b.reason}"</div>
+                    <div class="mt-2 text-right">
+                        <a href="https://www.torn.com/profiles.php?XID=${b.targetId}" target="_blank" 
+                           class="inline-block bg-neutral-900 text-white dark-web:bg-red-900 font-bold px-2 py-0.5 rounded text-[9px] uppercase tracking-wide hover:opacity-80 transition-opacity">
+                            [ HUNT ]
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch(err) {
+        console.error("[Portrait Sink Engine Error]", err);
+    }
+}
+
+// Initial fetch and poll every 30 seconds
+pollSyndicateContracts();
+setInterval(pollSyndicateContracts, 30000);
