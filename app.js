@@ -174,11 +174,11 @@ class ScraperEngine {
         // Note: Using the master key pool for public forum threads
         try {
             const categories = {
-                67: "Community Events",
-                62: "Bounties",
-                15: "Trade",
-                19: "Faction Discussion",
-                63: "Casino/Poker"
+                2: "General Discussion",
+                3: "Questions & Answers",
+                10: "Trading Post",
+                84: "Community Events",
+                75: "Poker"
             };
 
             // Randomly select one active category to report on this cycle to prevent spam
