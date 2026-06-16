@@ -35,7 +35,7 @@ const els = {
     statusIndicator: document.getElementById('data-status-indicator'),
     newsContainer: document.getElementById('news-container'),
     filters: document.querySelectorAll('.filter-btn'),
-    
+    calendarWidget: document.getElementById('calendar-widget'),
     premiumSection: document.getElementById('premium-section')
 };
 
@@ -111,10 +111,18 @@ class ScraperEngine {
     }
 
     async runCycle() {
-        await this.fetchBasicNews();
-        await this.fetchTornForums();
-        await this.runPremiumLocator();
-        await this.fetchCasinoAPIs();
+        if (!els.newsContainer) return;
+        
+        try {
+            // Update the City Calendar once per cycle
+            this.updateCalendar();
+
+            // Fetch public news via rotating Master Pool
+            await this.fetchBasicNews();
+            await this.fetchTornForums();
+            await this.runPremiumLocator();
+            await this.fetchCasinoAPIs();
+        } catch(e) { console.error(e); }
     }
 
     async fetchTornForums() {
@@ -250,6 +258,56 @@ class ScraperEngine {
             const targetLink = `<a href="https://www.torn.com/profiles.php?XID=${mockWhaleId}" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">Target [${mockWhaleId}]</a>`;
             this.triggerAlert("syndicate_intel", `💰 WHALE DETECTED AT BAZAAR`, `${targetLink}, a flagged high-net-worth individual, is currently liquidating massive assets in their bazaar. Keep an eye on their high-value item circulations.`);
         }
+
+        // TARGET 7: Simulated Foreign Hospital Watch
+        if (Math.random() > 0.4) {
+            const countries = ["South Africa", "Mexico", "UAE", "Switzerland", "Japan", "China", "Canada", "UK", "Argentina", "Hawaii"];
+            const randomCountry = countries[Math.floor(Math.random() * countries.length)];
+            const causes = ["suspected organized crime syndicate shootout", "massive faction retaliation", "coordinated dirty bomb fallout", "underground casino riot"];
+            const randomCause = causes[Math.floor(Math.random() * causes.length)];
+            this.triggerAlert("hospital_watch", `🚨 FOREIGN HOSPITAL OVERFLOW`, `Massive influx of patients reported at the <strong>${randomCountry} Hospital</strong> following a ${randomCause}. Local medical supplies are dwindling rapidly.`);
+        }
+
+        // TARGET 8: Simulated Market Inflation Watch
+        if (Math.random() > 0.4) {
+            const items = [
+                { name: "Xanax", base: 835000 },
+                { name: "Feathery Hotel Coupon", base: 14500000 },
+                { name: "Donator Pack", base: 24000000 },
+                { name: "Erotic DVD", base: 4500000 }
+            ];
+            const item = items[Math.floor(Math.random() * items.length)];
+            const variance = (Math.random() * 0.1) - 0.03; // Random variance -3% to +7%
+            const currentPrice = Math.floor(item.base * (1 + variance));
+            const trend = variance > 0 ? "📈 SOARING" : "📉 CRASHING";
+            
+            this.triggerAlert("market_inflation", `${trend} MARKET INFLATION`, `The street value of <strong>${item.name}</strong> is currently extremely volatile! Latest trades estimate an average moving price of <strong class="text-amber-600 dark-web:text-amber-400">$${currentPrice.toLocaleString()}</strong>.`);
+        }
+    }
+
+    updateCalendar() {
+        if (!els.calendarWidget) return;
+        
+        const now = new Date();
+        const month = now.getMonth();
+        
+        // Hardcoded Torn Events Schedule
+        const events = [
+            {m: 1, name: "Valentine's Day Event"},
+            {m: 2, name: "St. Patrick's Day"},
+            {m: 3, name: "Easter Egg Hunt"},
+            {m: 4, name: "Mr & Ms Torn"},
+            {m: 7, name: "Dog Tags"},
+            {m: 8, name: "Elimination"},
+            {m: 9, name: "Trick or Treat (Halloween)"},
+            {m: 11, name: "Christmas Town"}
+        ];
+        
+        // Find next event
+        let nextEvent = events.find(e => e.m >= month);
+        if (!nextEvent) nextEvent = events[0]; // Wrap around to next year
+        
+        els.calendarWidget.innerHTML = `UPCOMING EVENT: <strong class="text-white">${nextEvent.name}</strong>`;
     }
 
     async fetchCasinoAPIs() {
