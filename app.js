@@ -315,20 +315,44 @@ class ScraperEngine {
             this.triggerAlert("hospital_watch", `🚨 FOREIGN HOSPITAL OVERFLOW`, `Massive influx of patients reported at the <strong>${randomCountry} Hospital</strong> following a ${randomCause}. Local medical supplies are dwindling rapidly.`);
         }
 
-        // TARGET 8: Simulated Market Inflation Watch
-        if (Math.random() > 0.4) {
-            const items = [
-                { name: "Xanax", base: 835000 },
-                { name: "Feathery Hotel Coupon", base: 14500000 },
-                { name: "Donator Pack", base: 24000000 },
-                { name: "Erotic DVD", base: 4500000 }
-            ];
-            const item = items[Math.floor(Math.random() * items.length)];
-            const variance = (Math.random() * 0.1) - 0.03; // Random variance -3% to +7%
-            const currentPrice = Math.floor(item.base * (1 + variance));
-            const trend = variance > 0 ? "📈 SOARING" : "📉 CRASHING";
-
-            this.triggerAlert("market_inflation", `${trend} MARKET INFLATION`, `The street value of <strong>${item.name}</strong> is currently extremely volatile! Latest trades estimate an average moving price of <strong class="text-amber-600 dark-web:text-amber-400">$${currentPrice.toLocaleString()}</strong>.`);
+        // TARGET 8: Live Market Arbitrage & Inflation Tracker
+        if (Math.random() > 0.3) {
+            try {
+                // Config from crazy item.js (Arbitrage Targets)
+                const ARBITRAGE_TARGETS = {
+                    366: { name: "Xanax", typicalValue: 835000, maxBuyPrice: 800000 },
+                    283: { name: "Donator Pack", typicalValue: 24000000, maxBuyPrice: 22500000 },
+                    367: { name: "Feathery Hotel Coupon", typicalValue: 14500000, maxBuyPrice: 13800000 },
+                    616: { name: "Camel Plushie", typicalValue: 90000, maxBuyPrice: 82000 }
+                };
+                
+                const itemIds = Object.keys(ARBITRAGE_TARGETS);
+                const randomId = itemIds[Math.floor(Math.random() * itemIds.length)];
+                const meta = ARBITRAGE_TARGETS[randomId];
+                
+                const data = await this.fetchApi(`market/${randomId}/itemmarket`);
+                
+                if (data && data.itemmarket && data.itemmarket.item && data.itemmarket.listings && data.itemmarket.listings.length > 0) {
+                    const sorted = data.itemmarket.listings.sort((a,b) => a.price - b.price);
+                    const cheapest = sorted[0];
+                    
+                    if (cheapest.price <= meta.maxBuyPrice) {
+                        const profitPerItem = meta.typicalValue - cheapest.price;
+                        const totalProfit = profitPerItem * cheapest.amount;
+                        
+                        this.triggerAlert("market_inflation", `🚨 FLASH SALE: ${meta.name.toUpperCase()}`, `Massive arbitrage opportunity detected! Someone has listed ${cheapest.amount.toLocaleString()}x <strong>${meta.name}</strong> on the item market for only <strong class="text-green-500">$${cheapest.price.toLocaleString()}</strong> each! (Typical Value: $${meta.typicalValue.toLocaleString()}). Est Profit: <strong class="text-green-500">+$${totalProfit.toLocaleString()}</strong>. <a href="https://www.torn.com/imarket.php#/p=shop&step=shop&type=&searchname=${encodeURIComponent(meta.name)}" target="_blank" class="text-blue-500 dark-web:text-blue-400 hover:underline">Buy Now ↗</a>`);
+                    } else {
+                        // Fallback to basic inflation reporting if no arbitrage found
+                        const avg = data.itemmarket.item.average_price;
+                        const diff = cheapest.price - avg;
+                        const percent = Math.abs(diff / avg) * 100;
+                        if (percent > 0.5) {
+                            const trend = diff > 0 ? "📈 SOARING" : "📉 CRASHING";
+                            this.triggerAlert("market_inflation", `${trend} MARKET INFLATION`, `The street value of <strong>${meta.name}</strong> is currently volatile! The lowest available market listing is <strong class="text-amber-600 dark-web:text-amber-400">$${cheapest.price.toLocaleString()}</strong> (Moving Avg: $${avg.toLocaleString()}).`);
+                        }
+                    }
+                }
+            } catch (e) { console.warn("Market fetch failed", e); }
         }
     }
 
