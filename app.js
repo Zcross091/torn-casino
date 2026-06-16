@@ -4,7 +4,7 @@
 
 // ==========================================
 // CONFIGURATION
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLT0OBhhoa8TXb82NRwPV_KaPrPY_LNdlfeZQyU3Q9-bXpywtfONq22d6z7AwogRvC/exec'; 
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4LiE9-RbFIB3kulT4RtQWhX8ShF3I-eg4MIYW0eJ5Q3XdMIXw5njcPFD0_DtnlvjF/exec'; 
 // ==========================================
 
 const STATE = {
@@ -57,14 +57,23 @@ class ScraperEngine {
 
     async fetchApi(endpoint, specificKey = null) {
         try {
-            // Personal Key: Connect directly to Torn API (v1 format)
+            // Personal Key: Connect directly to Torn API (Dynamic v1/v2 format)
             if (specificKey) {
-                const parts = endpoint.split('/');
-                const cat = parts[0] || '';
-                const sel = parts[1] || '';
-                const url = `https://api.torn.com/${cat}/?selections=${sel}&key=${specificKey}`;
+                const v2Endpoints = ['torn/bounties', 'faction/members', 'user/attacks', 'faction/crimes'];
+                const isV2 = v2Endpoints.includes(endpoint);
                 
-                const res = await fetch(url);
+                let res;
+                if (isV2) {
+                    res = await fetch(`https://api.torn.com/v2/${endpoint}`, {
+                        headers: { 'Authorization': `ApiKey ${specificKey}` }
+                    });
+                } else {
+                    const parts = endpoint.split('/');
+                    const cat = parts[0] || '';
+                    const sel = parts[1] || '';
+                    res = await fetch(`https://api.torn.com/${cat}/?selections=${sel}&key=${specificKey}`);
+                }
+                
                 if (!res.ok) throw new Error(`API returned ${res.status}`);
                 return await res.json();
             }
