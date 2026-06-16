@@ -153,10 +153,10 @@ class ScraperEngine {
                 if (topBounties.length > 0) {
                     hitlistContainer.innerHTML = topBounties.map(b => `
                         <div class="flex-1 text-center py-2 px-4 hover:bg-red-50 transition-colors w-full">
-                            <div class="text-[10px] font-bold text-red-900 uppercase">Target [${b.target_id}]</div>
+                            <div class="text-[10px] font-bold text-red-900 uppercase">${b.target_name || 'Target'} [${b.target_id}]</div>
                             <div class="text-xl font-retro-title text-red-700 tracking-tighter my-1">$${b.reward.toLocaleString()}</div>
                             <div class="text-[9px] font-typewriter text-neutral-600">Listed for: ${b.listed_for} min</div>
-                            <a href="https://www.torn.com/bounties.php?p=main&step=custom&user=${b.target_id}" target="_blank" class="text-[10px] font-bold text-blue-600 hover:underline mt-1 inline-block">Hunt Target ↗</a>
+                            <a href="https://www.torn.com/profiles.php?XID=${b.target_id}" target="_blank" class="text-[10px] font-bold text-blue-600 hover:underline mt-1 inline-block">Hunt Target ↗</a>
                         </div>
                     `).join('');
                 } else {
@@ -242,8 +242,9 @@ class ScraperEngine {
                 const highest = bountiesList.sort((a, b) => (b.reward || 0) - (a.reward || 0))[0];
                 if (highest) {
                     const targetId = highest.target_id || highest.target || highest.player_id || "Unknown";
-                    const targetLink = `<a href="https://www.torn.com/profiles.php?XID=${targetId}" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">Target [${targetId}]</a>`;
-                    this.triggerAlert("syndicate_intel", `🎯 EXTREME BOUNTY: $${(highest.reward || 0).toLocaleString()}`, `A massive bounty has been placed on ${targetLink} for the following reason: "${highest.reason || 'Classified'}".`);
+                    const targetName = highest.target_name || highest.name || "Target";
+                    const targetLink = `<a href="https://www.torn.com/profiles.php?XID=${targetId}" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">${targetName} [${targetId}]</a>`;
+                    this.triggerAlert("syndicate_intel", `🎯 EXTREME BOUNTY: $${highest.reward.toLocaleString()}`, `A massive bounty has been placed on ${targetLink} for the following reason: "${highest.reason || 'None'}".`);
                 }
             }
         } catch (e) { console.warn("Bounties error", e); }
@@ -298,9 +299,7 @@ class ScraperEngine {
 
         // TARGET 6: Simulated Bazaar/Whale Monitor
         if (Math.random() > 0.3) {
-            const mockWhaleId = Math.floor(Math.random() * 500000) + 2000000;
-            const targetLink = `<a href="https://www.torn.com/profiles.php?XID=${mockWhaleId}" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">Target [${mockWhaleId}]</a>`;
-            this.triggerAlert("syndicate_intel", `💰 WHALE DETECTED AT BAZAAR`, `${targetLink}, a flagged high-net-worth individual, is currently liquidating massive assets in their bazaar. Keep an eye on their high-value item circulations.`);
+            this.triggerAlert("syndicate_intel", `💰 WHALE DETECTED AT BAZAAR`, `<span class="text-red-800 font-bold">[CLASSIFIED ID]</span>, a flagged high-net-worth individual, is currently liquidating massive assets in their bazaar. Keep an eye on their high-value item circulations.`);
         }
 
         // TARGET 7: Simulated Foreign Hospital Watch
