@@ -317,11 +317,11 @@ class ScraperEngine {
         try {
             // Config from crazy item.js (Arbitrage Targets)
             const ARBITRAGE_TARGETS = {
-                366: { name: "Xanax", typicalValue: 835000, maxBuyPrice: 800000 },
-                    283: { name: "Donator Pack", typicalValue: 24000000, maxBuyPrice: 22500000 },
-                    367: { name: "Feathery Hotel Coupon", typicalValue: 14500000, maxBuyPrice: 13800000 },
-                    616: { name: "Camel Plushie", typicalValue: 90000, maxBuyPrice: 82000 }
-                };
+                206: { name: "Xanax", typicalValue: 835000, maxBuyPrice: 800000 },
+                283: { name: "Donator Pack", typicalValue: 24000000, maxBuyPrice: 22500000 },
+                273: { name: "Feathery Hotel Coupon", typicalValue: 14500000, maxBuyPrice: 13800000 },
+                384: { name: "Camel Plushie", typicalValue: 90000, maxBuyPrice: 82000 }
+            };
                 
                 const itemIds = Object.keys(ARBITRAGE_TARGETS);
                 const randomId = itemIds[Math.floor(Math.random() * itemIds.length)];
