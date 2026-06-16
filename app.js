@@ -39,32 +39,6 @@ const els = {
     premiumSection: document.getElementById('premium-section')
 };
 
-// --- API Key Pool Logic ---
-async function fetchKeyPool() {
-    if (!GOOGLE_APP_SCRIPT_URL) {
-        console.warn("No Google Script URL set. Using hardcoded master key only.");
-        return;
-    }
-    try {
-        const res = await fetch(GOOGLE_APP_SCRIPT_URL);
-        const data = await res.json();
-        if (data.keys && data.keys.length > 0) {
-            // Merge with existing pool, remove duplicates
-            STATE.keyPool = [...new Set([...STATE.keyPool, ...data.keys])];
-            console.log(`Loaded ${STATE.keyPool.length} keys into the Round-Robin pool.`);
-        }
-    } catch (e) {
-        console.error("Failed to fetch keys from Google Sheets:", e);
-    }
-}
-
-function getNextKey() {
-    if (STATE.keyPool.length === 0) return null;
-    const key = STATE.keyPool[STATE.currentKeyIndex];
-    STATE.currentKeyIndex = (STATE.currentKeyIndex + 1) % STATE.keyPool.length;
-    return key;
-}
-
 // --- Scraper Engine ---
 class ScraperEngine {
     constructor() {
@@ -72,8 +46,7 @@ class ScraperEngine {
     }
 
     async start() {
-        console.log("Starting Scraper Engine...");
-        await fetchKeyPool();
+        console.log("Starting Scraper Engine (Reverse Proxy Mode)...");
         this.runCycle();
         this.pollInterval = setInterval(() => this.runCycle(), 60000); // 1 min rotation
     }
@@ -83,15 +56,29 @@ class ScraperEngine {
     }
 
     async fetchApi(endpoint, specificKey = null) {
-        const key = specificKey || getNextKey();
-        if (!key) return null;
-
         try {
-            const res = await fetch(`https://api.torn.com/v2/${endpoint}`, {
-                headers: { 'Authorization': `ApiKey ${key}` }
-            });
-            if (!res.ok) throw new Error(`API returned ${res.status}`);
-            return await res.json();
+            // Personal Key: Connect directly to Torn API
+            if (specificKey) {
+                const res = await fetch(`https://api.torn.com/v2/${endpoint}`, {
+                    headers: { 'Authorization': `ApiKey ${specificKey}` }
+                });
+                if (!res.ok) throw new Error(`API returned ${res.status}`);
+                return await res.json();
+            }
+            
+            // Anonymous Request: Route through Google Apps Script Proxy
+            if (GOOGLE_APP_SCRIPT_URL) {
+                const proxyUrl = `${GOOGLE_APP_SCRIPT_URL}?endpoint=${encodeURIComponent(endpoint)}`;
+                const res = await fetch(proxyUrl);
+                if (!res.ok) throw new Error(`Proxy returned ${res.status}`);
+                const data = await res.json();
+                if (data.error) throw new Error(`Proxy Error: ${data.error}`);
+                return data;
+            }
+
+            console.warn("No specific key and no proxy URL set.");
+            return null;
+
         } catch (err) {
             console.warn(`API Error on ${endpoint}:`, err);
             return null;
@@ -389,7 +376,6 @@ els.saveKeyBtn.addEventListener('click', async () => {
                     console.warn("Failed to push to Google Sheets", e);
                 }
             }
-            if (!STATE.keyPool.includes(val)) STATE.keyPool.push(val);
             activateSecureNetwork();
         }
 
