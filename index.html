@@ -226,13 +226,24 @@
                     🕶️ Dark Web
                 </button>
 
-                <h1
-                    class="font-retro-title text-4xl sm:text-6xl md:text-7xl uppercase tracking-tighter leading-none text-neutral-950 select-none">
-                    The Daily Torn Syndicate
-                </h1>
-                <p class="font-typewriter text-xs sm:text-sm uppercase tracking-widest text-neutral-700 mt-3 italic">
-                    "Decentralized, unblockable reporting direct from the Torn API to your screen."
-                </p>
+                <div
+                    class="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-10 mt-12 md:mt-4 mb-4 opacity-95 hover:opacity-100 transition-opacity">
+                    <!-- Titles -->
+                    <div class="flex flex-col items-center md:items-end text-center md:text-right">
+                        <h1
+                            class="font-retro-title text-5xl sm:text-6xl md:text-7xl lg:text-[5rem] uppercase tracking-tighter leading-none text-neutral-950 select-none">
+                            The Daily Torn Syndicate
+                        </h1>
+                        <p
+                            class="font-typewriter text-xs sm:text-sm uppercase tracking-widest text-neutral-700 mt-2 md:mt-3 italic max-w-2xl">
+                            "Decentralized, unblockable reporting direct from the Torn API to your screen."
+                        </p>
+                    </div>
+
+                    <!-- Right Illustration -->
+                    <img src="./retro_illustration.png" alt="Torn Syndicate Artwork"
+                        class="h-32 sm:h-40 md:h-48 lg:h-[15rem] object-contain drop-shadow-xl mix-blend-multiply flex-shrink-0">
+                </div>
             </div>
 
             <div
@@ -271,8 +282,14 @@
                         <input type="text" id="api_key_input" placeholder="Torn API Key (16 chars)" maxlength="16"
                             class="flex-1 bg-[#faf7ef] border-2 border-neutral-800 p-2 uppercase tracking-widest focus:outline-none focus:ring-2 focus:ring-amber-500">
                     </div>
-                    <p class="text-[9px] text-neutral-500 mb-2 font-bold text-amber-700">Optional but appreciated!
-                        Adding your key helps the Syndicate community pool gather more accurate intelligence.</p>
+                    <p class="text-[9px] sm:text-xs text-neutral-600 font-bold mb-2">
+                        Adding your key is completely optional but appreciated!
+                        <br><br>
+                        <span class="text-amber-700"><strong>Note:</strong> To unlock premium modules (like Faction
+                            Crimes and User Attacks) for the entire community, please provide a <strong>Limited
+                                Access</strong> key. Public keys will only power the basic news feeds. Your key will be
+                            securely pooled into our backend proxy to help power the global intelligence feed.</span>
+                    </p>
 
                     <div class="flex justify-between items-end border-b border-neutral-300 pb-1 mb-2 mt-2">
                         <span class="block font-bold text-sm uppercase text-neutral-800">🃏 Casino Data Modules (Local
@@ -298,29 +315,56 @@
 
 
 
+        <!-- City Calendar Banner -->
+        <div
+            class="bg-neutral-900 border-4 border-neutral-950 text-white p-3 mb-6 mx-auto flex flex-col md:flex-row items-center justify-between text-xs font-typewriter uppercase tracking-widest shadow-[4px_4px_0px_rgba(0,0,0,1)]">
+            <div class="flex items-center gap-2 mb-2 md:mb-0 text-amber-400 font-bold">
+                📅 CITY CALENDAR
+            </div>
+            <div id="calendar-widget" class="flex-1 text-center md:text-right text-neutral-300">
+                <span class="animate-pulse">Consulting City Archives...</span>
+            </div>
+        </div>
+
         <!-- Category Filters -->
         <section
-            class="mb-8 border-b border-neutral-800 pb-6 flex flex-wrap gap-2 justify-center text-xs font-typewriter uppercase"
+            class="mb-6 border-b border-neutral-800 pb-6 flex flex-wrap gap-2 justify-center text-xs font-typewriter uppercase"
             id="filters-container">
-            <button data-filter="all"
-                class="filter-btn px-3 py-2 border border-neutral-800 bg-neutral-900 text-white transition-colors">📰
-                Public Feed</button>
-            <button data-filter="community_chatter"
-                class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">🗣️
-                Community Chatter</button>
-            <button data-filter="syndicate_intel"
-                class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">🎯
-                Syndicate Intel</button>
-            <button data-filter="radioactive_watch"
-                class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">☢️
-                Radioactive Watch</button>
-            <button data-filter="war_reports"
-                class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">⚔️
-                War Reports</button>
-            <button data-filter="underground_casinos"
-                class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">🃏
-                Underground Casinos</button>
+            <button data-filter="all" class="filter-btn px-3 py-2 border border-neutral-800 bg-neutral-900 text-white transition-colors">📰 Public Feed</button>
+            <button data-filter="community_chatter" class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">🗣️ Community Chatter</button>
+            <button data-filter="syndicate_intel" class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">🎯 Syndicate Intel</button>
+            <button data-filter="radioactive_watch" class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">☢️ Radioactive Watch</button>
+            <button data-filter="war_reports" class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">⚔️ War Reports</button>
+            <button data-filter="hospital_watch" class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">🏥 Hospital Watch</button>
+            <button data-filter="market_inflation" class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">📈 Market Inflation</button>
+            <button data-filter="underground_casinos" class="filter-btn px-3 py-2 border border-neutral-800 hover:bg-neutral-900 hover:text-white transition-colors">🃏 Underground Casinos</button>
         </section>
+
+        <!-- Custom Sponsor Ad Banner -->
+        <div class="w-full bg-[#1e1e1e] border-2 border-neutral-900 p-2 sm:p-4 mb-6 shadow-md text-white font-retro-serif">
+            <div class="flex justify-between items-center text-[10px] sm:text-xs text-neutral-400 mb-2 px-1">
+                <span>Why not visit our sponsor?</span>
+                <span class="text-blue-400 cursor-pointer hover:underline">View all | Advertise here</span>
+            </div>
+            <a id="ad-banner-link" href="#" target="_blank" class="block w-full">
+                <img id="ad-banner-img" src="" alt="Sponsor Banner" class="w-full h-auto object-cover border border-neutral-700 hidden">
+                <div id="ad-banner-placeholder" class="w-full h-16 sm:h-24 bg-neutral-800 flex items-center justify-center text-neutral-600 border border-neutral-700 text-xs">
+                    [ AD SPACE AVAILABLE ]
+                </div>
+            </a>
+        </div>
+
+        <!-- Syndicate Hitlist (Most Wanted) -->
+        <div class="mb-8 border-4 border-red-900 bg-[#faf7ef] shadow-[4px_4px_0px_rgba(127,29,29,1)]">
+            <div class="bg-red-900 text-white p-2 text-center font-retro-title uppercase text-xl tracking-widest">
+                🎯 SYNDICATE HITLIST (MOST WANTED)
+            </div>
+            <div id="hitlist-container" class="p-4 flex flex-col md:flex-row gap-4 justify-center items-center divide-y md:divide-y-0 md:divide-x divide-red-200">
+                <div class="text-xs font-typewriter text-red-800 text-center w-full py-4 animate-pulse">
+                    Intercepting active Torn bounties...
+                </div>
+            </div>
+        </div>
 
         <!-- Dynamic News Container -->
         <div id="news-container">
@@ -336,7 +380,7 @@
 
         <footer
             class="border-t-4 border-neutral-900 mt-12 pt-6 flex flex-col md:flex-row justify-between items-center text-xs font-typewriter text-neutral-600">
-            <div class="mb-4 md:mb-0 text-center md:text-left"> 
+            <div class="mb-4 md:mb-0 text-center md:text-left">
                 <p class="font-bold">Not affiliated with Torn City. This is an Open Source Project.</p><br>
                 <p class="font-bold">© 2026 TORN TABLOID SYNDICATE COOP.</p>
             </div>
