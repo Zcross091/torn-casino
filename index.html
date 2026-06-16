@@ -122,7 +122,7 @@
     </div>
 
     <!-- Main Container -->
-    <div class="max-w-6xl mx-auto mt-8 bg-[#faf7ef] border-4 border-neutral-900 p-4 sm:p-8 shadow-2xl relative">
+    <div class="w-[98%] md:w-[95%] max-w-7xl 2xl:max-w-[90%] mx-auto mt-2 md:mt-8 bg-[#faf7ef] border-4 border-neutral-900 p-3 sm:p-6 md:p-8 shadow-2xl relative transition-all duration-500" id="main-container">
         
         <header class="border-b-4 border-neutral-900 pb-4 mb-6">
             <div class="flex flex-col sm:flex-row justify-between text-xs font-typewriter uppercase border-b border-neutral-800 pb-2 mb-4 text-neutral-600">
@@ -145,12 +145,14 @@
                 </p>
             </div>
 
-            <div class="border-t-4 border-b-2 border-neutral-900 py-2.5 flex flex-col md:flex-row justify-between items-center text-xs font-typewriter uppercase text-neutral-800">
-                <div class="mb-2 md:mb-0">
-                    <!-- Live TCT Clock -->
+            <div class="border-t-4 border-b-2 border-neutral-900 py-2.5 flex flex-col md:flex-row justify-between items-center text-xs font-typewriter uppercase text-neutral-800 gap-3">
+                <div class="flex items-center gap-2 flex-wrap justify-center">
+                    <!-- Device & Clock -->
+                    <span id="device-indicator" class="bg-neutral-800 text-white px-2 py-0.5 rounded text-[9px] tracking-widest font-bold hidden sm:inline-block">DEVICE: SCANNING</span>
+                    <span class="hidden sm:inline-block">|</span>
                     📅 <strong id="current-date">--</strong> | ⌚ <strong id="tct-clock" class="tracking-widest">--:--:--</strong> TCT
                 </div>
-                <div class="flex items-center gap-4">
+                <div class="flex items-center gap-2 md:gap-4 flex-wrap justify-center">
                     <span id="data-status-indicator" class="flex items-center gap-1.5 font-bold">
                         <span class="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block"></span> Basic News Feed
                     </span>

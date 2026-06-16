@@ -402,9 +402,36 @@ els.saveKeyBtn.addEventListener('click', async () => {
 
 const engine = new ScraperEngine();
 
+// --- Device Optimization Engine ---
+function detectDevice() {
+    const ua = navigator.userAgent;
+    const width = window.innerWidth;
+    let type = "UNKNOWN";
+
+    if (/SmartTV|AppleTV|Roku|PlayStation|Xbox|Wii/i.test(ua) || width > 1900) {
+        type = "TV / ULTRA-WIDE";
+    } else if (/iPad|Tablet|PlayBook/i.test(ua) || (width >= 768 && width <= 1024 && /Mobile/i.test(ua))) {
+        type = "TABLET";
+    } else if (/Mobile|Android|iP(hone|od)|IEMobile|BlackBerry|Silk/i.test(ua) || width < 768) {
+        type = "MOBILE TERMINAL";
+    } else {
+        type = "PC / LAPTOP";
+    }
+
+    const indicator = document.getElementById('device-indicator');
+    if (indicator) {
+        indicator.innerText = `LINKED: ${type}`;
+        // Give it a retro CRT flicker on load
+        indicator.classList.add('animate-pulse');
+        setTimeout(() => indicator.classList.remove('animate-pulse'), 3000);
+    }
+    console.log(`[Syndicate Diagnostic] Device fingerprint identified: ${type} (Width: ${width}px)`);
+}
+
 // Boot
 els.date.innerText = new Date().toLocaleDateString();
 startClock();
+detectDevice();
 engine.start();
 
 if (STATE.userKey.length === 16) {
