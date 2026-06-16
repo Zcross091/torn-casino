@@ -4,7 +4,7 @@
 
 // ==========================================
 // CONFIGURATION
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw54HeALl8qAtsAdBUR354hxJckB74cgmow3tj46SLlrIId1xhROl57CBRB_XfEFB7H/exec';
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxvQlXd2aUXxA2o5dinG0ee5DCvy_1iWXf4WM9TmNEIrVbnubFUCHLJYxVIUam0kaFi/exec';
 // ==========================================
 
 const STATE = {
@@ -70,7 +70,7 @@ class ScraperEngine {
             // Personal Key: Connect directly to Torn API (Dynamic v1/v2 format)
             if (specificKey) {
                 const v2Endpoints = ['torn/bounties', 'faction/members', 'user/attacks', 'faction/crimes', 'torn/calendar'];
-                const isV2 = v2Endpoints.includes(endpoint);
+                const isV2 = v2Endpoints.includes(endpoint) || endpoint.startsWith('forum/');
 
                 let res;
                 if (isV2) {
@@ -173,8 +173,6 @@ class ScraperEngine {
         // Scrape Torn Forums (Categories 67, 62, 15, 19, 63)
         // Note: Using the master key pool for public forum threads
         try {
-            // Simulated generic fetching of forum active threads since exact Torn API v2 forum endpoint structure
-            // varies based on thread selection vs category selection. We simulate the parser grabbing active posts.
             const categories = {
                 67: "Community Events",
                 62: "Bounties",
@@ -188,10 +186,16 @@ class ScraperEngine {
             const catName = categories[randomCatId];
 
             if (Math.random() > 0.4) {
-                // In a production environment with verified forum schema, you would parse the threads array here.
-                const mockThreadId = Math.floor(Math.random() * 10000000);
-                const forumLink = `<a href="https://www.torn.com/forums.php#/p=threads&f=${randomCatId}&t=${mockThreadId}&b=0&a=0" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">View Thread</a>`;
-                this.triggerAlert("community_chatter", `🗣️ TORN FORUMS: ${catName.toUpperCase()}`, `A new highly-active discussion has broken out in the ${catName} boards. ${forumLink} to see what the community is saying.`);
+                const data = await this.fetchApi(`forum/${randomCatId}/threads`);
+                if (data && data.threads && data.threads.length > 0) {
+                    const activeThreads = data.threads.filter(t => !t.is_locked);
+                    const topThread = activeThreads[0];
+                    
+                    if (topThread) {
+                        const forumLink = `<a href="https://www.torn.com/forums.php#/p=threads&f=${randomCatId}&t=${topThread.id}&b=0&a=0" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">View Thread</a>`;
+                        this.triggerAlert("community_chatter", `🗣️ TORN FORUMS: ${catName.toUpperCase()}`, `A highly-active discussion titled "<strong>${topThread.title}</strong>" is trending in the ${catName} boards. ${forumLink} to join the conversation.`);
+                    }
+                }
             }
         } catch (e) { console.warn("Forum fetch failed", e); }
     }
