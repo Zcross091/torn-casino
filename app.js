@@ -440,6 +440,10 @@ els.saveKeyBtn.addEventListener('click', async () => {
                 try {
                     await fetch(GOOGLE_APP_SCRIPT_URL, {
                         method: 'POST',
+                        mode: 'no-cors',
+                        headers: {
+                            'Content-Type': 'text/plain',
+                        },
                         body: JSON.stringify({ api_key: val })
                     });
                 } catch(e) {
