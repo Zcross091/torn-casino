@@ -58,7 +58,7 @@ class ScraperEngine {
     async start() {
         console.log("Starting Scraper Engine (Reverse Proxy Mode)...");
         this.runCycle();
-        this.pollInterval = setInterval(() => this.runCycle(), 60000); // 1 min rotation
+        this.pollInterval = setInterval(() => this.runCycle(), 15000); // 15 sec rotation for higher data density
     }
 
     stop() {
@@ -185,9 +185,8 @@ class ScraperEngine {
             const randomCatId = Object.keys(categories)[Math.floor(Math.random() * Object.keys(categories).length)];
             const catName = categories[randomCatId];
 
-            if (Math.random() > 0.4) {
-                const data = await this.fetchApi(`forum/${randomCatId}/threads`);
-                if (data && data.threads && data.threads.length > 0) {
+            const data = await this.fetchApi(`forum/${randomCatId}/threads`);
+            if (data && data.threads && data.threads.length > 0) {
                     const activeThreads = data.threads.filter(t => !t.is_locked);
                     const topThread = activeThreads[0];
                     
@@ -196,7 +195,6 @@ class ScraperEngine {
                         this.triggerAlert("community_chatter", `🗣️ TORN FORUMS: ${catName.toUpperCase()}`, `A highly-active discussion titled "<strong>${topThread.title}</strong>" is trending in the ${catName} boards. ${forumLink} to join the conversation.`);
                     }
                 }
-            }
         } catch (e) { console.warn("Forum fetch failed", e); }
     }
 
@@ -316,11 +314,10 @@ class ScraperEngine {
         }
 
         // TARGET 8: Live Market Arbitrage & Inflation Tracker
-        if (Math.random() > 0.3) {
-            try {
-                // Config from crazy item.js (Arbitrage Targets)
-                const ARBITRAGE_TARGETS = {
-                    366: { name: "Xanax", typicalValue: 835000, maxBuyPrice: 800000 },
+        try {
+            // Config from crazy item.js (Arbitrage Targets)
+            const ARBITRAGE_TARGETS = {
+                366: { name: "Xanax", typicalValue: 835000, maxBuyPrice: 800000 },
                     283: { name: "Donator Pack", typicalValue: 24000000, maxBuyPrice: 22500000 },
                     367: { name: "Feathery Hotel Coupon", typicalValue: 14500000, maxBuyPrice: 13800000 },
                     616: { name: "Camel Plushie", typicalValue: 90000, maxBuyPrice: 82000 }
@@ -352,8 +349,7 @@ class ScraperEngine {
                         }
                     }
                 }
-            } catch (e) { console.warn("Market fetch failed", e); }
-        }
+        } catch (e) { console.warn("Market fetch failed", e); }
     }
 
     async updateCalendar() {
