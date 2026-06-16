@@ -4,7 +4,7 @@
 
 // ==========================================
 // CONFIGURATION
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx4LiE9-RbFIB3kulT4RtQWhX8ShF3I-eg4MIYW0eJ5Q3XdMIXw5njcPFD0_DtnlvjF/exec';
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw54HeALl8qAtsAdBUR354hxJckB74cgmow3tj46SLlrIId1xhROl57CBRB_XfEFB7H/exec';
 // ==========================================
 
 const STATE = {
@@ -69,7 +69,7 @@ class ScraperEngine {
         try {
             // Personal Key: Connect directly to Torn API (Dynamic v1/v2 format)
             if (specificKey) {
-                const v2Endpoints = ['torn/bounties', 'faction/members', 'user/attacks', 'faction/crimes'];
+                const v2Endpoints = ['torn/bounties', 'faction/members', 'user/attacks', 'faction/crimes', 'torn/calendar'];
                 const isV2 = v2Endpoints.includes(endpoint);
 
                 let res;
@@ -125,7 +125,7 @@ class ScraperEngine {
 
         try {
             // Update the City Calendar once per cycle
-            this.updateCalendar();
+            await this.updateCalendar();
 
             // Fetch public news via rotating Master Pool
             await this.fetchHitlist();
@@ -328,29 +328,26 @@ class ScraperEngine {
         }
     }
 
-    updateCalendar() {
+    async updateCalendar() {
         if (!els.calendarWidget) return;
 
-        const now = new Date();
-        const month = now.getMonth();
-
-        // Hardcoded Torn Events Schedule
-        const events = [
-            { m: 1, name: "Valentine's Day Event" },
-            { m: 2, name: "St. Patrick's Day" },
-            { m: 3, name: "Easter Egg Hunt" },
-            { m: 4, name: "Mr & Ms Torn" },
-            { m: 7, name: "Dog Tags" },
-            { m: 8, name: "Elimination" },
-            { m: 9, name: "Trick or Treat (Halloween)" },
-            { m: 11, name: "Christmas Town" }
-        ];
-
-        // Find next event
-        let nextEvent = events.find(e => e.m >= month);
-        if (!nextEvent) nextEvent = events[0]; // Wrap around to next year
-
-        els.calendarWidget.innerHTML = `UPCOMING EVENT: <strong class="text-white">${nextEvent.name}</strong>`;
+        try {
+            const data = await this.fetchApi("torn/calendar");
+            if (data && data.calendar && data.calendar.events) {
+                const now = Date.now() / 1000;
+                // Find the first event that hasn't ended yet
+                const upcoming = data.calendar.events.find(e => e.end > now);
+                
+                if (upcoming) {
+                    els.calendarWidget.innerHTML = `UPCOMING EVENT: <strong class="text-white uppercase">${upcoming.title}</strong>`;
+                    return;
+                }
+            }
+            els.calendarWidget.innerHTML = `UPCOMING EVENT: <strong class="text-neutral-500">NO EVENT FOUND</strong>`;
+        } catch (e) {
+            console.warn("Calendar fetch failed", e);
+            els.calendarWidget.innerHTML = `<span class="text-red-500">CALENDAR OFFLINE</span>`;
+        }
     }
 
     async fetchCasinoAPIs() {
