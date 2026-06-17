@@ -39,7 +39,6 @@ const els = {
     settingsBtn: document.getElementById('toggle-settings-btn'),
     settingsPanel: document.getElementById('settings-panel'),
     apiKeyInput: document.getElementById('api_key_input'),
-    xfApiInput: document.getElementById('xf_api_input'),
     saveKeyBtn: document.getElementById('save-key-btn'),
     statusIndicator: document.getElementById('data-status-indicator'),
     newsContainer: document.getElementById('news-container'),
@@ -131,7 +130,6 @@ class ScraperEngine {
             await this.fetchBasicNews();
             await this.fetchTornForums();
             await this.runPremiumLocator();
-            await this.fetchCasinoAPIs();
         } catch (e) { console.error(e); }
     }
 
@@ -395,32 +393,12 @@ class ScraperEngine {
             els.calendarWidget.innerHTML = `<span class="text-red-500">CALENDAR OFFLINE</span>`;
         }
     }
-
-    async fetchCasinoAPIs() {
-        // Xanflip Fetch
-        if (STATE.xfKey) {
-            try {
-                // Simulated fetching based on user's API key
-                const rand = Math.random();
-                if (rand > 0.7) {
-                    this.triggerAlert("underground_casinos", `🎟️ XANFLIP: NEW RAFFLE!`, `A massive new Raffle has just been posted on Xanflip. <a href="https://xanflip.com/raffles" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">View Raffles</a>`);
-                } else if (rand > 0.4) {
-                    this.triggerAlert("underground_casinos", `🔨 XANFLIP: HIGH-VALUE AUCTION`, `An incredibly rare item has hit the Xanflip auction blocks. Bidding is heating up! <a href="https://xanflip.com/auctions" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">View Auctions</a>`);
-                } else if (rand > 0.2) {
-                    this.triggerAlert("underground_casinos", `🏆 XANFLIP: LEADERBOARD SHIFT`, `The Xanflip high-roller leaderboards just saw a massive shift in rank. Someone is winning big today. <a href="https://xanflip.com/leaderboard" target="_blank" class="text-blue-600 dark-web:text-blue-400 hover:underline">View Leaderboard</a>`);
-                }
-            } catch (e) {
-                console.warn("Xanflip fetch failed due to CORS or network error", e);
-            }
-        }
-    }
 }
 
 // --- UI Rendering ---
 function activateSecureNetwork() {
     els.statusIndicator.innerHTML = `<span class="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block"></span> Secure Network Active`;
     engine.runPremiumLocator();
-    engine.fetchCasinoAPIs();
 }
 
 function renderNews() {
@@ -508,11 +486,6 @@ els.themeToggle.addEventListener('click', () => {
 
 els.saveKeyBtn.addEventListener('click', async () => {
     const val = els.apiKeyInput.value.trim();
-
-    // Save Casino Credentials Locally
-    const xfKey = els.xfApiInput ? els.xfApiInput.value.trim() : '';
-
-    if (xfKey) { STATE.xfKey = xfKey; localStorage.setItem('xf_api_key', xfKey); }
 
     if (val.length === 16 || val === "") {
         els.saveKeyBtn.innerText = "Submitting...";
@@ -607,7 +580,6 @@ engine.start();
 
 if (STATE.userKey.length === 16) {
     els.apiKeyInput.value = STATE.userKey;
-    if (els.xfApiInput && STATE.xfKey) els.xfApiInput.value = STATE.xfKey;
     activateSecureNetwork();
 }
 
