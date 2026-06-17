@@ -9,7 +9,6 @@ const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzyd1j8Hs
 
 const STATE = {
     userKey: localStorage.getItem('torn_api_key') || '',
-    xfKey: localStorage.getItem('xf_api_key') || '',
 
     // Master Key Pool
     keyPool: [],
