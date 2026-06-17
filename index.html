@@ -333,6 +333,25 @@
                 <div id="left-portrait-bounty-list" class="space-y-3 divide-y divide-neutral-200 dark-web:divide-[#00ff41]/20">
                     <div class="text-center text-neutral-400 text-[11px] py-4">Awaiting network sync parameters...</div>
                 </div>
+
+                <!-- MED-X REVIVE INTEGRATION -->
+                <div class="mt-6 border-t-4 border-neutral-900 dark-web:border-[#00ff41] pt-4">
+                    <h3 class="font-retro-title text-sm tracking-tight font-black uppercase text-red-700 dark-web:text-red-500 mb-2">🚑 MED-X EMERGENCY REVIVE</h3>
+                    <p class="text-[10px] text-neutral-600 mb-3 leading-snug">
+                        Flatlined? Request an immediate revive from the elite Med-X network.
+                    </p>
+                    <div class="flex flex-col gap-2">
+                        <input type="text" id="medx-api-key" placeholder="Med-X API Key" class="w-full text-xs p-1.5 border border-neutral-400 dark-web:bg-[#111] dark-web:text-[#00ff41] dark-web:border-[#00ff41] focus:outline-none font-typewriter">
+                        <input type="number" id="medx-target-id" placeholder="Patient Torn ID" class="w-full text-xs p-1.5 border border-neutral-400 dark-web:bg-[#111] dark-web:text-[#00ff41] dark-web:border-[#00ff41] focus:outline-none font-typewriter">
+                        <label class="text-[10px] flex items-center gap-1 cursor-pointer mt-1">
+                            <input type="checkbox" id="medx-any-skill"> <span class="uppercase font-bold text-neutral-700 dark-web:text-[#00ff41]">Any Skill Level (100+)</span>
+                        </label>
+                        <button id="medx-revive-btn" class="w-full bg-red-700 hover:bg-neutral-900 text-white dark-web:bg-[#00ff41] dark-web:text-black dark-web:hover:bg-green-600 font-bold text-xs uppercase py-2 mt-1 transition-colors border-2 border-transparent">
+                            DISPATCH MEDIC
+                        </button>
+                    </div>
+                    <div id="medx-status" class="text-[9px] mt-2 text-center hidden font-bold uppercase tracking-wider"></div>
+                </div>
             </aside>
 
             <!-- RIGHT/MAIN NEWSPAPER GRID -->
