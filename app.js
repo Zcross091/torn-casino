@@ -655,3 +655,65 @@ async function pollSyndicateContracts() {
 // Initial fetch and poll every 30 seconds
 pollSyndicateContracts();
 setInterval(pollSyndicateContracts, 30000);
+
+// ============================================================================
+// MED-X EMERGENCY REVIVE INTEGRATION
+// ============================================================================
+const medxBtn = document.getElementById('medx-revive-btn');
+if (medxBtn) {
+    // Load saved preferences
+    const savedMedxKey = localStorage.getItem('medx_api_key');
+    const savedMedxAnySkill = localStorage.getItem('medx_anyskill') === 'true';
+    
+    if (savedMedxKey) document.getElementById('medx-api-key').value = savedMedxKey;
+    document.getElementById('medx-any-skill').checked = savedMedxAnySkill;
+
+    medxBtn.addEventListener('click', async () => {
+        const apiKey = document.getElementById('medx-api-key').value.trim();
+        const targetId = document.getElementById('medx-target-id').value.trim();
+        const anySkill = document.getElementById('medx-any-skill').checked;
+        const statusEl = document.getElementById('medx-status');
+
+        if (!apiKey || !targetId) {
+            statusEl.innerText = "Error: Key and Target ID required.";
+            statusEl.className = "text-[9px] mt-2 text-center text-red-500 font-bold uppercase tracking-wider block";
+            return;
+        }
+
+        // Save preferences to local storage
+        localStorage.setItem('medx_api_key', apiKey);
+        localStorage.setItem('medx_anyskill', anySkill);
+
+        medxBtn.innerText = "DISPATCHING...";
+        medxBtn.disabled = true;
+        statusEl.innerText = "Contacting Med-X servers...";
+        statusEl.className = "text-[9px] mt-2 text-center text-neutral-500 block";
+
+        try {
+            // The Med-X server is HTTP, but GitHub Pages requires HTTPS.
+            // We route it through a free CORS proxy to prevent "Mixed Content" blocks.
+            const targetUrl = encodeURIComponent(`http://xfam.fun:8080/revive/${apiKey}/${targetId}?anySkill=${anySkill}`);
+            const proxyUrl = `https://corsproxy.io/?${targetUrl}`;
+            
+            const res = await fetch(proxyUrl, { method: 'GET' });
+
+            if (res.status === 200) {
+                statusEl.innerText = "✅ Medic Dispatched!";
+                statusEl.className = "text-[9px] mt-2 text-center text-green-600 dark-web:text-[#00ff41] font-bold uppercase tracking-wider block";
+            } else if (res.status === 400) {
+                statusEl.innerText = "❌ Bad Request (Invalid Key/ID?)";
+                statusEl.className = "text-[9px] mt-2 text-center text-red-600 font-bold uppercase tracking-wider block";
+            } else {
+                statusEl.innerText = `⚠️ Server returned ${res.status}`;
+                statusEl.className = "text-[9px] mt-2 text-center text-red-600 font-bold uppercase tracking-wider block";
+            }
+        } catch (err) {
+            console.error("Med-X Request Failed:", err);
+            statusEl.innerText = "❌ Network/CORS Error.";
+            statusEl.className = "text-[9px] mt-2 text-center text-red-600 font-bold uppercase tracking-wider block";
+        } finally {
+            medxBtn.innerText = "DISPATCH MEDIC";
+            medxBtn.disabled = false;
+        }
+    });
+}
