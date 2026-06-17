@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Syndicate Toolkit | Black Market Scripts</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Special+Elite&display=swap" rel="stylesheet">
+    <style>
+        .font-retro-title { font-family: 'Special Elite', cursive, serif; }
+        .font-retro-serif { font-family: 'Playfair Display', Georgia, serif; }
+        .font-typewriter { font-family: 'Courier Prime', monospace; }
+
+        body {
+            background-color: #f5eedc;
+            background-image: radial-gradient(rgba(0, 0, 0, 0.03) 1.2px, transparent 0),
+                radial-gradient(rgba(0, 0, 0, 0.02) 1px, transparent 0);
+            background-size: 12px 12px;
+            background-position: 0 0, 6px 6px;
+        }
+
+        body.dark-web {
+            background-color: #050505;
+            background-image: none;
+            color: #00ff41;
+        }
+
+        body.dark-web .bg-\[\#faf7ef\] { background-color: #0a0a0a; border-color: #333; }
+        body.dark-web .border-neutral-900 { border-color: #00ff41; }
+        body.dark-web .text-neutral-900, body.dark-web .text-neutral-950 { color: #00ff41; }
+        body.dark-web .bg-neutral-900 { background-color: #00ff41; color: #000; }
+        body.dark-web hr { border-color: #333; }
+    </style>
+</head>
+
+<body class="text-neutral-900 font-retro-serif min-h-screen pb-16 transition-colors dark-web">
+
+    <div class="w-[98%] md:w-[95%] max-w-4xl mx-auto mt-8 bg-[#faf7ef] border-4 border-neutral-900 p-6 shadow-2xl relative">
+        <div class="border-b-4 border-neutral-900 pb-4 mb-6">
+            <a href="index.html" class="text-xs font-typewriter uppercase hover:underline mb-4 inline-block">&larr; Return to Main Feed</a>
+            <h1 class="font-retro-title text-4xl uppercase tracking-tighter text-neutral-950 text-center">
+                Syndicate Toolkit
+            </h1>
+            <p class="font-typewriter text-xs text-center mt-2 uppercase tracking-widest text-neutral-600">
+                Unauthorized Browser Extensions & Scripts
+            </p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            
+            <!-- Left Info Panel -->
+            <div class="md:col-span-1 border-r-0 md:border-r-2 border-neutral-300 dark-web:border-[#333] pr-0 md:pr-4 font-typewriter text-xs">
+                <h3 class="font-bold uppercase mb-3 text-sm border-b border-neutral-300 pb-2">Installation Guide</h3>
+                <p class="mb-4 text-neutral-500">All tools hosted here are raw Tampermonkey scripts designed for power users.</p>
+                <ol class="space-y-3 leading-relaxed text-neutral-400">
+                    <li>1. Install <a href="https://www.tampermonkey.net/" target="_blank" class="underline text-red-500 dark-web:text-[#00ff41]">Tampermonkey</a> on your browser.</li>
+                    <li>2. Click "Install Script" next to any tool.</li>
+                    <li>3. Tampermonkey will automatically prompt you to review and install the code.</li>
+                </ol>
+            </div>
+
+            <!-- Scripts List -->
+            <div class="md:col-span-2 space-y-8">
+                
+                <!-- Bzimor Script -->
+                <div class="border-2 border-neutral-900 p-4 relative overflow-hidden dark-web:bg-[#111]">
+                    <div class="absolute top-0 right-0 bg-neutral-900 text-white dark-web:bg-[#00ff41] dark-web:text-black font-typewriter text-[9px] px-2 py-1 font-bold tracking-widest uppercase">
+                        v1.0
+                    </div>
+                    <h2 class="font-retro-title text-2xl uppercase tracking-tight mb-2 text-neutral-950">Bzimor Bazaar Opener</h2>
+                    <p class="font-typewriter text-xs text-neutral-600 mb-4">
+                        Injects an automation control panel into <a href="https://torn.bzimor.dev/items/bazaar/" target="_blank" class="underline">torn.bzimor.dev</a>. Allows you to bulk-open all Bazaars matching your target price criteria with a single click. Features smart cooldowns to prevent opening duplicate tabs.
+                    </p>
+                    <a href="bzimor.user.js" target="_blank" class="inline-block bg-red-700 text-white hover:bg-neutral-900 dark-web:bg-red-900 dark-web:hover:bg-red-700 font-typewriter font-bold uppercase px-4 py-2 text-xs transition-colors border-2 border-transparent">
+                        INSTALL SCRIPT ↗
+                    </a>
+                </div>
+
+                <!-- Coming soon slots for their other scripts! -->
+                <div class="border-2 border-neutral-300 border-dashed p-4 relative opacity-60">
+                    <h2 class="font-retro-title text-xl uppercase tracking-tight mb-2 text-neutral-500">Med-X Revive UI</h2>
+                    <p class="font-typewriter text-[10px] text-neutral-400 mb-4">
+                        Coming soon to the Syndicate network...
+                    </p>
+                </div>
+                
+                <div class="border-2 border-neutral-300 border-dashed p-4 relative opacity-60">
+                    <h2 class="font-retro-title text-xl uppercase tracking-tight mb-2 text-neutral-500">Faction Inactivity Radar</h2>
+                    <p class="font-typewriter text-[10px] text-neutral-400 mb-4">
+                        Coming soon to the Syndicate network...
+                    </p>
+                </div>
+
+                <div class="border-2 border-neutral-300 border-dashed p-4 relative opacity-60">
+                    <h2 class="font-retro-title text-xl uppercase tracking-tight mb-2 text-neutral-500">Intercept Action Linker</h2>
+                    <p class="font-typewriter text-[10px] text-neutral-400 mb-4">
+                        Coming soon to the Syndicate network...
+                    </p>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
