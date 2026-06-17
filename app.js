@@ -605,14 +605,15 @@ async function pollSyndicateContracts() {
             portraitContainer.innerHTML = activeContracts.slice(0, 4).map(b => `
                 <div class="pt-2 flex flex-col justify-between text-xs">
                     <div class="flex justify-between items-start font-bold">
-                        <span class="text-neutral-950 uppercase text-[11px]">${b.targetName}</span>
+                        <span class="text-neutral-950 uppercase text-[11px]">${b.numBounties}x Bounties: ${b.targetNameId}</span>
                         <span class="text-red-700 dark-web:text-[#00ff41] font-mono font-black">$${parseInt(b.reward).toLocaleString()}</span>
                     </div>
                     <div class="text-[10px] text-neutral-600 mt-0.5 italic line-clamp-1">"${b.reason}"</div>
-                    <div class="mt-2 text-right">
-                        <a href="https://www.torn.com/profiles.php?XID=${b.targetId}" target="_blank" 
+                    <div class="mt-2 text-right flex justify-between items-center">
+                        <span class="text-[9px] text-neutral-500 font-bold uppercase">${b.id}</span>
+                        <a href="bounty_claim.html?id=${b.id}" target="_blank" 
                            class="inline-block bg-neutral-900 text-white dark-web:bg-red-900 font-bold px-2 py-0.5 rounded text-[9px] uppercase tracking-wide hover:opacity-80 transition-opacity">
-                            [ HUNT ]
+                            [ CLAIM HIT ]
                         </a>
                     </div>
                 </div>
