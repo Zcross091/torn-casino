@@ -19,7 +19,45 @@ const STATE = {
 
     // Known targets to monitor for the premium feature
     traders: [1, 2, 3], // Dummy IDs for whales
+
+    // Breaking News Tracking
+    lastCirculation: JSON.parse(localStorage.getItem('rare_circulation')) || {},
 };
+
+// Global function to trigger the popup
+window.triggerBreakingNews = function(title, body) {
+    const modal = document.getElementById('breaking-news-modal');
+    if (!modal) return;
+    document.getElementById('breaking-news-title').innerHTML = title;
+    document.getElementById('breaking-news-body').innerHTML = body;
+    modal.style.display = 'block';
+    
+    // Auto-hide after 15 seconds
+    setTimeout(() => { modal.style.display = 'none'; }, 15000);
+}
+
+// Ultra Rare Artifacts to watch
+const RARE_ITEMS_WATCHLIST = {
+    106: "Parachute",
+    331: "Dumbbells",
+    348: "Hazmat Suit",
+    1063: "Parachute Pants",
+    355: "Gold AK-47",
+    1023: "Statue of Juliet",
+    1024: "Statue of Romeo",
+    1007: "Duke's Safe"
+};
+
+// Top HOF Factions to monitor for Chains
+const MONITORED_FACTIONS = [
+    474,   // Natural Selection
+    8151,  // Monarch
+    13784, // JFK
+    11796, // Subversive Alliance
+    35507, // Nuclear M
+    8400,  // Chain Reaction
+    9528   // Med-X (User requested)
+];
 
 const CUSTOM_ADS = [
     // Add custom banner objects here. Only the developer can modify this array.
@@ -230,6 +268,60 @@ class ScraperEngine {
         if (STATE.newsItems.length === 0) {
             this.triggerAlert("war_reports", "CITY ON EDGE: GANG ACTIVITY SPIKES", "The Torn City police department reports increased gang activity across all sectors. Citizens are advised to stay indoors.");
         }
+        
+        // --- BREAKING NEWS SCANNERS ---
+        this.runBreakingNewsScanners();
+    }
+
+    async runBreakingNewsScanners() {
+        // 1. Faction Chain Watcher
+        try {
+            // Pick 1 random faction per cycle to prevent rate limit exhaustion
+            const randomFaction = MONITORED_FACTIONS[Math.floor(Math.random() * MONITORED_FACTIONS.length)];
+            const factionData = await this.fetchApi(`faction/${randomFaction}/?selections=basic`);
+            
+            if (factionData && factionData.chain && factionData.name) {
+                if (factionData.chain.current >= 2500) {
+                    window.triggerBreakingNews(
+                        `🚨 RAMPAGE ALERT: ${factionData.name.toUpperCase()}`,
+                        `The notorious faction <strong>${factionData.name}</strong> is currently on a massive, bloody rampage with an active chain of <strong>${factionData.chain.current.toLocaleString()} hits</strong>!`
+                    );
+                }
+            }
+        } catch(e) { console.warn("Faction chain scanner failed", e); }
+
+        // 2. Artifact Discovery Scanner
+        try {
+            const itemsData = await this.fetchApi("torn/?selections=items");
+            if (itemsData && itemsData.items) {
+                let circulationUpdated = false;
+                
+                for (const [id, name] of Object.entries(RARE_ITEMS_WATCHLIST)) {
+                    if (itemsData.items[id]) {
+                        const currentCirc = itemsData.items[id].circulation;
+                        const previousCirc = STATE.lastCirculation[id];
+
+                        if (previousCirc !== undefined && currentCirc > previousCirc) {
+                            // Circulation increased! Someone found it.
+                            window.triggerBreakingNews(
+                                `💎 ARTIFACT DISCOVERED: ${name.toUpperCase()}`,
+                                `The global circulation of the ultra-rare <strong>${name}</strong> has just increased from ${previousCirc} to <strong>${currentCirc}</strong>! An unknown citizen has uncovered an anomaly.`
+                            );
+                        }
+
+                        // Save new baseline
+                        if (currentCirc !== previousCirc) {
+                            STATE.lastCirculation[id] = currentCirc;
+                            circulationUpdated = true;
+                        }
+                    }
+                }
+                
+                if (circulationUpdated) {
+                    localStorage.setItem('rare_circulation', JSON.stringify(STATE.lastCirculation));
+                }
+            }
+        } catch(e) { console.warn("Artifact scanner failed", e); }
     }
 
     async runPremiumLocator() {
