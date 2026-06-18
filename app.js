@@ -4,7 +4,7 @@
 
 // ==========================================
 // CONFIGURATION
-const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzeKcwsvzgt_Rf68Kph4s40qyLLWTQkdRAKolZ2QvhVLt88STfhoUWLVLURmky1cVeD/exec';
+const GOOGLE_APP_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxcD0ipp8iZ_jnkE-QPMOG4gLbaq6_6RvWjI6tvg8-VW3W-bemUFucckguEjWSsEsSa/exec';
 // ==========================================
 
 const STATE = {
@@ -624,9 +624,9 @@ async function pollSyndicateContracts() {
     }
 }
 
-// Initial fetch and poll every 30 seconds
+// Initial fetch and poll every 15 seconds
 pollSyndicateContracts();
-setInterval(pollSyndicateContracts, 30000);
+setInterval(pollSyndicateContracts, 15000);
 
 // ============================================================================
 // MED-X EMERGENCY REVIVE INTEGRATION
